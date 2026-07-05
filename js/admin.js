@@ -5,6 +5,9 @@ let activeTab = "tab-overview";
 let previousOrdersCount = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // Force passcode login on every page load/refresh
+  sessionStorage.removeItem("km_admin_auth");
+
   // Check auth
   checkSessionAuth();
   
