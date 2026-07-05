@@ -79,7 +79,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Create WhatsApp Text Template
       const text = `*Kamadhenu Veg - Table Reservation Request*\n\nName: ${name}\nPhone: ${phone}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} People\nOccasion: ${occasion}\nNotes: ${notes || 'None'}\n\n*Reference ID: ${savedRes.id}*`;
-      const waUrl = `https://wa.me/919876543210?text=${encodeURIComponent(text)}`;
+      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+      const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
       
       // Notify User and Open WhatsApp
       alert(`Booking Sent Successfully! Your reservation reference is: ${savedRes.id}. We are redirecting you to WhatsApp to confirm.`);
@@ -190,7 +191,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (fabWa) {
     fabWa.addEventListener("click", () => {
       const text = "*Kamadhenu Veg - Table Booking / Catering Inquiry*\n\nHello, I would like to make an inquiry about dine-in table reservations or outdoor catering services.";
-      window.open(`https://wa.me/919876543210?text=${encodeURIComponent(text)}`, "_blank");
+      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+      window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, "_blank");
     });
   }
 });
@@ -463,7 +465,8 @@ async function submitPreOrder(event) {
 
   // Generate simulated WhatsApp order link
   const text = `*Kamadhenu Veg - Pre-Order Pickup Booking*\n\nName: ${name}\nPhone: ${phone}\nPickup Time: ${time}\nEst. Prep Time: ${maxPrepTime} mins\nSpecial Notes: ${notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`;
-  const waUrl = `https://wa.me/919876543210?text=${encodeURIComponent(text)}`;
+  const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
 
   alert(`Pre-Order Placed Successfully! Your Order ID is: ${savedOrder.id}. Est. Prep Time: ${maxPrepTime} mins. We are redirecting you to WhatsApp to complete confirmation.`);
   window.open(waUrl, "_blank");

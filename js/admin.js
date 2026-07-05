@@ -101,9 +101,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       
       const headline = document.getElementById("settings-hero-title").value;
       const hoursText = document.getElementById("settings-hours-text").value;
+      const whatsapp = document.getElementById("settings-whatsapp").value.trim();
 
       localStorage.setItem("settings_hero_title", headline);
       localStorage.setItem("settings_hours_text", hoursText);
+      localStorage.setItem("settings_whatsapp_phone", whatsapp);
 
       // Save prep times
       const prepTimes = {
@@ -749,9 +751,11 @@ async function renderFeedbackLog() {
 async function renderContentSettingsForm() {
   const headline = localStorage.getItem("settings_hero_title") || "Experience Premium Vegetarian Dining in Hyderabad";
   const hoursText = localStorage.getItem("settings_hours_text") || "12:30 PM - 11:45 PM";
+  const whatsappText = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
 
   document.getElementById("settings-hero-title").value = headline;
   document.getElementById("settings-hours-text").value = hoursText;
+  document.getElementById("settings-whatsapp").value = whatsappText;
 
   // Populate category prep times
   const prepTimes = await DB.getPrepTimes();
