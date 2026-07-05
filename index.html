@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO & Meta Tags -->
+  <title>Kamadhenu Veg - Premium Pure Vegetarian Family Restaurant in Hyderabad</title>
+  <meta name="description" content="Experience premium pure vegetarian dining at Kamadhenu Veg, Hyderabad. Serving delicious North Indian, South Indian, and Chinese cuisine with organic ingredients in a family atmosphere.">
+  <meta name="keywords" content="vegetarian restaurant, pure veg hyderabad, narsingi restaurant, south indian food, paneer butter masala, dining hyderabad">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="business.business">
+  <meta property="og:title" content="Kamadhenu Veg | Premium Pure Vegetarian Family Restaurant">
+  <meta property="og:description" content="Savor premium pure vegetarian dishes, from sizzling tandoori starters to our signature Irani Chai Tiramisu, at Snehitha Hills, Narsingi, Hyderabad.">
+  <meta property="og:image" content="images/hero-bg.jpg">
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Local Business Schema Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FoodEstablishment",
+    "name": "Kamadhenu Veg",
+    "image": "images/hero-bg.jpg",
+    "logo": "images/logo.jpg",
+    "@id": "https://kamadhenuveg.com",
+    "url": "https://kamadhenuveg.com",
+    "telephone": "+919876543210",
+    "priceRange": "₹₹",
+    "servesCuisine": "North Indian, South Indian, Chinese, Pure Vegetarian",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "1-24/9, Plot 09, Third Floor, ASR Complex, Snehitha Hills, Phase 1, Peeramcheruvu Village, Kali Mandir Road, Narsingi",
+      "addressLocality": "Hyderabad",
+      "addressRegion": "Telangana",
+      "postalCode": "500089",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 17.3824,
+      "longitude": 78.3752
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "12:30",
+      "closes": "23:45"
+    },
+    "starRating": {
+      "@type": "Rating",
+      "ratingValue": "4.2",
+      "bestRating": "5",
+      "ratingCount": "1600"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation -->
+  <header class="site-header" id="site-header">
+    <div class="container">
+      <nav class="nav-container">
+        <a href="#hero" class="logo">
+          Kamadhenu <span>Veg</span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#reviews">Reviews</a></li>
+          <li><a href="#contact">Book Table</a></li>
+          <li><a href="admin.html" style="color: var(--secondary);"><i class="fa-solid fa-lock"></i> Admin Portal</a></li>
+        </ul>
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <!-- Pre-order Cart Button -->
+          <button class="btn btn-secondary btn-nav" id="cart-toggle-btn" style="padding: 10px 18px; border-radius: 50px;">
+            <i class="fa-solid fa-shopping-basket"></i>
+            <span id="cart-count-badge" style="background-color: var(--accent); color: white; border-radius: 50%; padding: 2px 7px; font-size: 11px; margin-left: 4px;">0</span>
+          </button>
+          <a href="#contact" class="btn btn-primary btn-nav" style="padding: 10px 20px;">Reserve Table</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section id="hero" class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="tagline-premium">
+          <i class="fa-solid fa-leaf"></i> 100% Pure Vegetarian Harmony
+        </span>
+        <h1 id="hero-headline-text">Experience Premium <span>Vegetarian Dining</span> in Hyderabad</h1>
+        <p>Welcome to Kamadhenu Veg, Narsingi's highly-rated culinary gem. Indulge in clean, flavorful North Indian specialties, crispy South Indian classics, and mouth-watering Chinese delights cooked by master chefs.</p>
+        
+        <div class="hero-rating">
+          <div class="stars">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star-half-stroke"></i>
+          </div>
+          <span style="font-weight: 600;">4.2★</span>
+          <span style="opacity: 0.8; font-size: 13px;">(1,600+ Google Reviews)</span>
+        </div>
+
+        <div style="margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+          <span id="time-status-badge" style="padding: 6px 14px; border-radius: 50px; font-weight: bold; font-size: 13px;">Checking Status...</span>
+          <span id="hero-hours-label-text" style="font-size: 13px; opacity: 0.8;">Hours: 12:30 PM - 11:45 PM</span>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#menu" class="btn btn-primary"><i class="fa-solid fa-utensils"></i> Explore Menu</a>
+          <button class="btn btn-secondary" onclick="openPreOrder()" style="color: white; border-color: white;"><i class="fa-solid fa-cart-shopping"></i> Order Pickup</button>
+          <a href="#contact" class="btn btn-accent"><i class="fa-solid fa-calendar-days"></i> Book Table</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us Section -->
+  <section id="about" class="section">
+    <div class="container">
+      <div class="about-grid">
+        <div>
+          <span class="section-header" style="text-align: left; margin-bottom: 20px;">
+            <span class="sub">Our Legacy</span>
+            <h2 style="font-size: 32px; margin-bottom: 15px;">A Tradition of Taste, Quality, and Family</h2>
+          </span>
+          <p style="color: var(--text-muted); margin-bottom: 20px;">Kamadhenu Veg stands for gastronomic excellence and pristine vegetarian dining. Nestled in Snehitha Hills, Narsingi, our mission is to offer premium quality meals that families, IT professionals, and students look forward to every day.</p>
+          <p style="color: var(--text-muted); margin-bottom: 30px;">We use only fresh, locally sourced farm produce, triple-purified water, and cold-pressed oils. Our kitchens strictly adhere to absolute hygiene standards, ensuring that every meal served is healthy, clean, and filled with taste.</p>
+          
+          <div class="about-features">
+            <div class="about-feat-box">
+              <i class="fa-solid fa-heart-circle-check" style="color: var(--primary); font-size: 24px;"></i>
+              <h4>100% Hygienic</h4>
+              <p>Certified clean-prep kitchen and premium organic ingredients.</p>
+            </div>
+            <div class="about-feat-box">
+              <i class="fa-solid fa-user-group" style="color: var(--secondary); font-size: 24px;"></i>
+              <h4>Family Friendly</h4>
+              <p>Comfortable dining space setup for large groups & celebrations.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <img src="images/hero-bg.jpg" alt="Dining Ambience" style="width: 100%; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 5px solid white;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Today's Chef's Special (Editable) -->
+  <section id="special" class="section section-bg-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="sub">Today's Highlight</span>
+        <h2>Chef's Special Recommendation</h2>
+      </div>
+      <div class="special-banner" id="special-banner-card">
+        <!-- Rendered dynamically by JS -->
+        <div class="special-grid">
+          <div class="special-content">
+            <span class="special-badge" id="special-badge">Loading...</span>
+            <h3 id="special-name">Loading Dish...</h3>
+            <p class="special-desc" id="special-desc">Fetching today's fresh culinary recommendation...</p>
+            <div class="special-price-row">
+              <span class="special-price" id="special-price">₹0</span>
+              <div class="special-offer">
+                <span>Special Promo Offer</span>
+                <span id="special-discount" style="font-weight: normal; color: var(--secondary-light); font-size:12px;">N/A</span>
+              </div>
+            </div>
+            <button class="btn btn-accent" id="special-add-cart-btn"><i class="fa-solid fa-plus"></i> Add to Pre-Order</button>
+          </div>
+          <div>
+            <img id="special-img" src="" alt="Special Dish" class="special-img">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Menu Section -->
+  <section id="menu" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="sub">Culinary Treasures</span>
+        <h2>Explore Our Complete Menu</h2>
+      </div>
+
+      <div class="menu-controls">
+        <!-- Menu Search -->
+        <div class="search-wrapper">
+          <i class="fa-solid fa-search"></i>
+          <input type="text" id="menu-search-input" placeholder="Search for Paneer, Naan, Fried Rice, Desserts...">
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs" id="menu-category-tabs">
+          <button class="tab-btn active" data-category="all">All Items</button>
+          <button class="tab-btn" data-category="Starters">Starters</button>
+          <button class="tab-btn" data-category="Soups">Soups</button>
+          <button class="tab-btn" data-category="Main Course">Main Course</button>
+          <button class="tab-btn" data-category="Breads">Breads</button>
+          <button class="tab-btn" data-category="Rice & Noodles">Rice & Noodles</button>
+          <button class="tab-btn" data-category="Desserts">Desserts</button>
+          <button class="tab-btn" data-category="Beverages">Beverages</button>
+        </div>
+      </div>
+
+      <!-- Menu Items Display Grid -->
+      <div class="menu-grid" id="menu-items-grid">
+        <!-- Rendered by JS -->
+      </div>
+      
+      <!-- Printable QR Link Banner -->
+      <div style="text-align: center; margin-top: 50px; background: white; padding: 25px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px dashed var(--secondary);">
+        <i class="fa-solid fa-qrcode" style="font-size: 32px; color: var(--primary); margin-bottom: 10px;"></i>
+        <h4 style="font-family: var(--font-heading); margin-bottom: 6px;">Printable Table QR Menu</h4>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Are you the owner? Get your high-resolution printable table stand digital menu poster in one click.</p>
+        <a href="qr.html" target="_blank" class="btn btn-secondary btn-sm" style="padding: 8px 18px; font-size:13px;"><i class="fa-solid fa-print"></i> Generate Printable PDF Menu</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loyalty Program & Lead Collection widget -->
+  <section id="loyalty" class="section section-bg-alt">
+    <div class="container" style="max-width: 800px;">
+      <div class="section-header">
+        <span class="sub">Rewards Program</span>
+        <h2>Kamadhenu Loyalty Rewards</h2>
+        <p style="font-size:14px; color: var(--text-muted); margin-top: 8px;">Every 10th Meal is completely FREE! Check your progress and claim rewards below.</p>
+      </div>
+
+      <div class="loyalty-widget">
+        <div id="loyalty-search-form">
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="flex-grow: 1;">
+              <input type="tel" id="loyalty-phone-input" placeholder="Enter Registered Phone Number" style="width:100%; padding:14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 15px; outline:none;" required>
+            </div>
+            <button class="btn btn-primary" id="loyalty-check-btn" style="border-radius: 8px;"><i class="fa-solid fa-search"></i> Check My Rewards</button>
+          </div>
+        </div>
+
+        <div id="loyalty-progress-view" style="display: none; margin-top: 20px;">
+          <h3 style="font-size: 20px; color: var(--primary-dark); margin-bottom: 5px;" id="loyalty-user-title">Hello Guest!</h3>
+          <p style="font-size: 13px; color: var(--text-muted);" id="loyalty-member-since">Member since: 05-07-2026</p>
+          
+          <div class="loyalty-progress-container">
+            <div class="loyalty-progress-bar" id="loyalty-bar"></div>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 20px;">
+            <span id="loyalty-visits-count">0 of 10 meals completed</span>
+            <span id="loyalty-remaining-meals" style="color: var(--accent);">10 more visits to your FREE meal!</span>
+          </div>
+
+          <div class="loyalty-stamps" id="loyalty-stamps-grid">
+            <!-- Earned Stamps rendered here -->
+          </div>
+
+          <div id="loyalty-notification-badge" style="display:none; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px; font-weight: 600;">
+            🎉 Congratulations! You have earned a FREE meal! Present your coupon code: <span style="font-family: monospace; font-size:18px; color:var(--primary); font-weight:800; background:white; padding:2px 8px; border-radius:4px; margin-left:5px;">FREE10THMEAL</span> during checkout.
+          </div>
+
+          <button class="btn btn-secondary btn-sm" id="loyalty-reset-btn" style="margin-top:20px; padding: 6px 14px; font-size: 12px; border-radius: 4px;">Search Another Number</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="sub">Visual Feast</span>
+        <h2>Restaurant Ambience & Kitchen</h2>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- Ambient Item 1 -->
+        <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80', 'Fine Dining Ambiance')">
+          <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80" alt="Kamadhenu Ambiance" loading="lazy">
+          <div class="gallery-overlay">
+            <i class="fa-solid fa-search-plus" style="font-size:24px; margin-bottom:8px;"></i>
+            <h4>Dine-In Area</h4>
+            <p style="font-size:11px;">Premium family seating</p>
+          </div>
+        </div>
+
+        <!-- Kitchen Item 2 -->
+        <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80', 'Hygienic Kitchen Prep')">
+          <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80" alt="Kitchen Setup" loading="lazy">
+          <div class="gallery-overlay">
+            <i class="fa-solid fa-search-plus" style="font-size:24px; margin-bottom:8px;"></i>
+            <h4>Prinstine Kitchen</h4>
+            <p style="font-size:11px;">Highest hygienic standards</p>
+          </div>
+        </div>
+
+        <!-- Food Platter Item 3 -->
+        <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=800&q=80', 'Tandoori Sizzling Starters')">
+          <img src="https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=800&q=80" alt="Starters" loading="lazy">
+          <div class="gallery-overlay">
+            <i class="fa-solid fa-search-plus" style="font-size:24px; margin-bottom:8px;"></i>
+            <h4>Fresh Naan & Tandoor</h4>
+            <p style="font-size:11px;">Baked hot to order</p>
+          </div>
+        </div>
+
+        <!-- Drinks/Staff Item 4 -->
+        <div class="gallery-item" onclick="openLightbox('https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=800&q=80', 'Rich Curries & Platters')">
+          <img src="https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=800&q=80" alt="Traditional Curries" loading="lazy">
+          <div class="gallery-overlay">
+            <i class="fa-solid fa-search-plus" style="font-size:24px; margin-bottom:8px;"></i>
+            <h4>Healthy Delicacies</h4>
+            <p style="font-size:11px;">Authentic flavors</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox Gallery Modal -->
+  <div id="lightbox" class="lightbox-modal" onclick="closeLightbox()">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+      <img id="lightbox-img" src="" alt="Zoomed Content">
+      <p id="lightbox-caption" style="color: white; text-align: center; margin-top: 10px; font-weight: 500;"></p>
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <section id="reviews" class="section section-bg-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="sub">Testimonials</span>
+        <h2>What Our Guests Say About Us</h2>
+      </div>
+
+      <div class="reviews-grid" id="reviews-items-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Table Reservation & Pre-Order Forms -->
+  <section id="contact" class="section">
+    <div class="container">
+      <div class="contact-grid">
+        <!-- Info Cards Column -->
+        <div class="contact-info-panel">
+          <div>
+            <span class="sub">Find Us & Reach Us</span>
+            <h2 style="font-size: 28px; margin-bottom: 20px;">Contact Information</h2>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+            <div class="info-details">
+              <h4>Restaurant Address</h4>
+              <p>1-24/9, Plot 09, Third Floor, ASR Complex, Snehitha Hills, Phase 1, Peeramcheruvu Village, Kali Mandir Road, Narsingi, Hyderabad, Telangana 500089</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon"><i class="fa-solid fa-phone-volume"></i></div>
+            <div class="info-details">
+              <h4>Call for Reservations</h4>
+              <p>+91 98765 43210 / +91 40 2345 6789</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
+            <div class="info-details">
+              <h4>Email Address</h4>
+              <p>contact@kamadhenuveg.com</p>
+            </div>
+          </div>
+
+          <!-- Opening Hours List widget -->
+          <div class="info-item">
+            <div class="info-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="info-details" style="width: 100%;">
+              <h4>Weekly Operating Hours</h4>
+              <ul class="hours-list" id="hours-list-view">
+                <li data-day="1">Monday <span>12:30 PM - 11:45 PM</span></li>
+                <li data-day="2">Tuesday <span>12:30 PM - 11:45 PM</span></li>
+                <li data-day="3">Wednesday <span>12:30 PM - 11:45 PM</span></li>
+                <li data-day="4">Thursday <span>12:30 PM - 11:45 PM</span></li>
+                <li data-day="5">Friday <span>12:30 PM - 11:45 PM</span></li>
+                <li data-day="6">Saturday <span>12:30 PM - 11:45 PM</span></li>
+                <li data-day="0">Sunday <span>12:30 PM - 11:45 PM</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Card Column -->
+        <div class="form-card">
+          <h3 style="font-size: 22px; margin-bottom: 25px; border-bottom: 1px solid var(--border-light); padding-bottom: 12px;"><i class="fa-solid fa-calendar-check" style="color: var(--secondary);"></i> Instantly Reserve a Table</h3>
+          <form id="reservation-form">
+            <div class="form-group">
+              <label for="res-name">Your Full Name *</label>
+              <input type="text" id="res-name" placeholder="E.g., Anish Kumar" required>
+            </div>
+            <div class="form-group">
+              <label for="res-phone">WhatsApp Contact Number *</label>
+              <input type="tel" id="res-phone" placeholder="E.g., 9876543210" required>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div class="form-group">
+                <label for="res-date">Dine-in Date *</label>
+                <input type="date" id="res-date" required>
+              </div>
+              <div class="form-group">
+                <label for="res-time">Dine-in Time *</label>
+                <input type="time" id="res-time" required>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div class="form-group">
+                <label for="res-guests">Number of Guests *</label>
+                <select id="res-guests" required>
+                  <option value="2">2 People</option>
+                  <option value="4">4 People</option>
+                  <option value="6">6 People</option>
+                  <option value="8">8+ People (Family Dining)</option>
+                  <option value="12">12+ People (Party Group)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="res-occasion">Special Occasion</label>
+                <select id="res-occasion">
+                  <option value="None">Just dining out</option>
+                  <option value="Birthday">Birthday Celebration</option>
+                  <option value="Anniversary">Anniversary dinner</option>
+                  <option value="Corporate">Business lunch</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="res-notes">Special Dietary / Seating Requests</label>
+              <textarea id="res-notes" rows="3" placeholder="E.g., Near window seat, high chair for kids, low salt etc."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; border-radius: 8px;"><i class="fa-solid fa-check"></i> Book Table (Simulated Confirmation)</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Google Maps Section -->
+  <section class="map-section">
+    <!-- Static Google Map Iframe centered at Peeramcheruvu, Narsingi area -->
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3808.2045558914614!2d78.3547285!3d17.3827471!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb95cf65d4b8df%3A0xe546d1bf035775f0!2sSnehitha%20Hills%2C%20Peeramcheruvu%2C%20Hyderabad%2C%20Telangana%20500089!5e0!3m2!1sen!2sin!4v1688583492576!5m2!1sen!2sin" allowfullscreen="" loading="lazy"></iframe>
+    <a href="https://maps.google.com/?q=Kamadhenu+Veg+ASR+Complex+Narsingi+Hyderabad" target="_blank" class="btn btn-accent map-overlay-btn"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions on Google Maps</a>
+  </section>
+
+  <!-- Customer Feedback & Rating Form -->
+  <section id="feedback-section" class="section section-bg-alt">
+    <div class="container" style="max-width: 650px;">
+      <div class="form-card" style="padding: 30px;">
+        <h3 style="font-size: 20px; text-align:center; margin-bottom: 20px;"><i class="fa-regular fa-comment-dots" style="color:var(--primary);"></i> Share Your Dining Experience</h3>
+        <form id="feedback-form">
+          <div style="display:flex; justify-content:center; gap:10px; margin-bottom: 20px;" id="rating-stars-picker">
+            <i class="fa-regular fa-star" data-rating="1" style="font-size: 26px; cursor:pointer; color:#ffb400;"></i>
+            <i class="fa-regular fa-star" data-rating="2" style="font-size: 26px; cursor:pointer; color:#ffb400;"></i>
+            <i class="fa-regular fa-star" data-rating="3" style="font-size: 26px; cursor:pointer; color:#ffb400;"></i>
+            <i class="fa-regular fa-star" data-rating="4" style="font-size: 26px; cursor:pointer; color:#ffb400;"></i>
+            <i class="fa-regular fa-star" data-rating="5" style="font-size: 26px; cursor:pointer; color:#ffb400;"></i>
+          </div>
+          <input type="hidden" id="feedback-rating-val" value="0" required>
+          
+          <div class="form-group">
+            <label for="fb-name">Full Name</label>
+            <input type="text" id="fb-name" placeholder="Enter your name" required>
+          </div>
+          <div class="form-group">
+            <label for="fb-phone">Phone Number (to credit Loyalty Visits!)</label>
+            <input type="tel" id="fb-phone" placeholder="Enter your phone" required>
+          </div>
+          <div class="form-group">
+            <label for="fb-text">Comments & Feedback</label>
+            <textarea id="fb-text" rows="3" placeholder="Tell us what you liked or how we can improve..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; border-radius: 8px;"><i class="fa-solid fa-paper-plane"></i> Submit Feedback</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pre-Order Sidebar Cart Drawer -->
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3><i class="fa-solid fa-shopping-cart"></i> Pre-Order for Pickup</h3>
+      <span class="cart-close" id="cart-close-btn">&times;</span>
+    </div>
+    
+    <div class="cart-items" id="cart-items-container">
+      <!-- Items dynamically populated -->
+      <div style="text-align: center; color: var(--text-muted); margin-top:50px;">
+        <i class="fa-solid fa-basket-shopping" style="font-size: 40px; margin-bottom: 10px; opacity:0.3;"></i>
+        <p>Your cart is empty. Add items from the menu to pre-order.</p>
+      </div>
+    </div>
+
+    <div class="cart-footer">
+      <div class="cart-total-row" style="margin-bottom: 5px;">
+        <span>Subtotal</span>
+        <span id="cart-total-price">₹0</span>
+      </div>
+      <div id="cart-prep-row" style="display: none; justify-content: space-between; font-size: 13px; color: var(--primary); font-weight: 600; margin-bottom: 15px; background: #eef7ee; padding: 6px 12px; border-radius: 6px;">
+        <span><i class="fa-solid fa-clock"></i> Est. Prep Time</span>
+        <span id="cart-prep-duration">0 mins</span>
+      </div>
+
+      <!-- Pre-Order Checkout Form -->
+      <form id="preorder-form" onsubmit="submitPreOrder(event)">
+        <div class="form-group" style="margin-bottom:12px;">
+          <input type="text" id="ord-name" placeholder="Pickup Person's Name" style="padding:10px; border-radius:6px;" required>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <input type="tel" id="ord-phone" placeholder="WhatsApp Phone Number" style="padding:10px; border-radius:6px;" required>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label style="font-size:11px; margin-bottom:4px; font-weight:600;">Preferred Pickup Time</label>
+          <input type="time" id="ord-time" style="padding:10px; border-radius:6px;" required>
+        </div>
+        <div class="form-group" style="margin-bottom:15px;">
+          <input type="text" id="ord-notes" placeholder="Special instructions (e.g., extra spicy)" style="padding:10px; border-radius:6px;">
+        </div>
+
+        <button type="submit" class="btn btn-accent" style="width: 100%; border-radius: 8px;"><i class="fa-solid fa-bag-shopping"></i> Complete Pre-Order Booking</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lead Capture Modal Popup -->
+  <div class="modal-overlay" id="lead-popup-overlay">
+    <div class="modal-content">
+      <span class="modal-close" id="lead-popup-close">&times;</span>
+      <i class="fa-solid fa-gift" style="font-size: 45px; color: var(--accent); margin-bottom: 15px;"></i>
+      <span class="lead-popup-badge">EXCLUSIVE DINE-IN OFFER</span>
+      <h3 style="font-size:24px; margin-bottom:10px;">Claim 10% Discount on First Dine-In!</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 25px;">Enter your phone number to receive a 10% off discount coupon directly on WhatsApp, and join our elite loyalty rewards program!</p>
+      
+      <form id="lead-form">
+        <div class="form-group" style="margin-bottom:15px;">
+          <input type="text" id="lead-name" placeholder="Your Full Name" style="text-align:center; padding:12px;" required>
+        </div>
+        <div class="form-group" style="margin-bottom:15px;">
+          <input type="tel" id="lead-phone" placeholder="WhatsApp Phone Number" style="text-align:center; padding:12px;" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; border-radius: 50px;">Get My 10% Discount Coupon</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bottom Floating FAB Container -->
+  <div class="floating-container">
+    <div class="fab fab-whatsapp" id="fab-wa" title="Dine-in / Catering Booking"><i class="fa-brands fa-whatsapp"></i></div>
+    <a href="tel:+919876543210" class="fab fab-call" title="Click to Call"><i class="fa-solid fa-phone"></i></a>
+    <div class="fab fab-top" id="fab-scroll-top" title="Scroll to Top"><i class="fa-solid fa-chevron-up"></i></div>
+  </div>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Logo & Story -->
+        <div class="footer-col">
+          <h3 style="font-size:22px; color:white; margin-bottom:15px;">Kamadhenu <span style="color:var(--secondary);">Veg</span></h3>
+          <p>The premium choice for vegetarian families, students, and corporate teams in Narsingi, Hyderabad. Delivering outstanding taste and hygiene, every time.</p>
+          <div class="social-links">
+            <a href="https://instagram.com/kamadhenuveghyd" target="_blank" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://facebook.com/kamadhenuveghyd" target="_blank" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://g.page/kamadhenu-veg-narsingi" target="_blank" class="social-icon"><i class="fa-brands fa-google"></i></a>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="footer-col">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#hero">Home Base</a></li>
+            <li><a href="#about">Our Story</a></li>
+            <li><a href="#menu">Digital Menu</a></li>
+            <li><a href="#gallery">Ambience Gallery</a></li>
+            <li><a href="#reviews">Guest Reviews</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact details -->
+        <div class="footer-col">
+          <h3>Contact Details</h3>
+          <p><i class="fa-solid fa-map-marker-alt" style="color: var(--secondary); margin-right: 8px;"></i> ASR Complex, Snehitha Hills, Narsingi, Hyderabad.</p>
+          <p><i class="fa-solid fa-phone" style="color: var(--secondary); margin-right: 8px;"></i> +91 98765 43210</p>
+          <p><i class="fa-solid fa-envelope" style="color: var(--secondary); margin-right: 8px;"></i> info@kamadhenuveg.com</p>
+        </div>
+
+        <!-- Pre-order notice / CTA -->
+        <div class="footer-col">
+          <h3>Pre-Order & Pickup</h3>
+          <p>Order ahead to save time! Choose your favorites online, select your convenient pickup time, and have it sizzling hot when you arrive.</p>
+          <button onclick="openPreOrder()" class="btn btn-secondary btn-sm" style="color: white; border-color: white; padding: 8px 18px; margin-top:10px;"><i class="fa-solid fa-basket-shopping"></i> Start Pre-Order</button>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Kamadhenu Veg. All rights reserved.</p>
+        <div style="display:flex; gap:20px;">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="admin.html">Dashboard Portal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
