@@ -704,3 +704,4 @@ window.changeQty = changeQty;
 window.openPreOrder = openPreOrder;
 window.openLightbox = openLightbox;
 window.closeLightbox = closeLightbox;
+window.submitPreOrder = submitPreOrder;
