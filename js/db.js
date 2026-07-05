@@ -398,27 +398,39 @@ const DB = {
 
   async updateReservationStatus(id, status) {
     if (this.isSupabase()) {
-      const { error } = await supabaseClient.from("km_reservations").update({ status }).eq("id", id);
-      if (!error) {
-        const { data: res } = await supabaseClient.from("km_reservations").select("phone").eq("id", id).single();
-        if (status === "Completed" && res) {
-          await this.incrementVisits(res.phone);
+      if (status === "Cancelled") {
+        const { error } = await supabaseClient.from("km_reservations").delete().eq("id", id);
+        if (!error) return { id, status };
+        console.warn("DB Layer: Supabase delete reservation failed.", error);
+      } else {
+        const { error } = await supabaseClient.from("km_reservations").update({ status }).eq("id", id);
+        if (!error) {
+          const { data: res } = await supabaseClient.from("km_reservations").select("phone").eq("id", id).single();
+          if (status === "Completed" && res) {
+            await this.incrementVisits(res.phone);
+          }
+          return { id, status };
         }
-        return { id, status };
+        console.warn("DB Layer: Supabase updateReservationStatus failed.", error);
       }
-      console.warn("DB Layer: Supabase updateReservationStatus failed.", error);
     }
 
     this.initLocal();
-    const reservations = JSON.parse(localStorage.getItem("km_reservations"));
-    const res = reservations.find(r => r.id === id);
-    if (res) {
-      res.status = status;
+    let reservations = JSON.parse(localStorage.getItem("km_reservations"));
+    if (status === "Cancelled") {
+      reservations = reservations.filter(r => r.id !== id);
       localStorage.setItem("km_reservations", JSON.stringify(reservations));
-      if (status === "Completed") {
-        this.incrementVisits(res.phone);
+      return { id, status };
+    } else {
+      const res = reservations.find(r => r.id === id);
+      if (res) {
+        res.status = status;
+        localStorage.setItem("km_reservations", JSON.stringify(reservations));
+        if (status === "Completed") {
+          this.incrementVisits(res.phone);
+        }
+        return res;
       }
-      return res;
     }
     return null;
   },
@@ -463,27 +475,39 @@ const DB = {
 
   async updatePreOrderStatus(id, status) {
     if (this.isSupabase()) {
-      const { error } = await supabaseClient.from("km_preorders").update({ status }).eq("id", id);
-      if (!error) {
-        const { data: ord } = await supabaseClient.from("km_preorders").select("phone").eq("id", id).single();
-        if (status === "Completed" && ord) {
-          await this.incrementVisits(ord.phone);
+      if (status === "Cancelled") {
+        const { error } = await supabaseClient.from("km_preorders").delete().eq("id", id);
+        if (!error) return { id, status };
+        console.warn("DB Layer: Supabase delete preorder failed.", error);
+      } else {
+        const { error } = await supabaseClient.from("km_preorders").update({ status }).eq("id", id);
+        if (!error) {
+          const { data: ord } = await supabaseClient.from("km_preorders").select("phone").eq("id", id).single();
+          if (status === "Completed" && ord) {
+            await this.incrementVisits(ord.phone);
+          }
+          return { id, status };
         }
-        return { id, status };
+        console.warn("DB Layer: Supabase updatePreOrderStatus failed.", error);
       }
-      console.warn("DB Layer: Supabase updatePreOrderStatus failed.", error);
     }
 
     this.initLocal();
-    const preorders = JSON.parse(localStorage.getItem("km_preorders"));
-    const ord = preorders.find(o => o.id === id);
-    if (ord) {
-      ord.status = status;
+    let preorders = JSON.parse(localStorage.getItem("km_preorders"));
+    if (status === "Cancelled") {
+      preorders = preorders.filter(o => o.id !== id);
       localStorage.setItem("km_preorders", JSON.stringify(preorders));
-      if (status === "Completed") {
-        this.incrementVisits(ord.phone);
+      return { id, status };
+    } else {
+      const ord = preorders.find(o => o.id === id);
+      if (ord) {
+        ord.status = status;
+        localStorage.setItem("km_preorders", JSON.stringify(preorders));
+        if (status === "Completed") {
+          this.incrementVisits(ord.phone);
+        }
+        return ord;
       }
-      return ord;
     }
     return null;
   },
