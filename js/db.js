@@ -402,6 +402,7 @@ const DB = {
         const { error } = await supabaseClient.from("km_reservations").delete().eq("id", id);
         if (!error) return { id, status };
         console.warn("DB Layer: Supabase delete reservation failed.", error);
+        alert(`Database Error (Reservations Delete Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
       } else {
         const { error } = await supabaseClient.from("km_reservations").update({ status }).eq("id", id);
         if (!error) {
@@ -412,6 +413,7 @@ const DB = {
           return { id, status };
         }
         console.warn("DB Layer: Supabase updateReservationStatus failed.", error);
+        alert(`Database Error (Reservations Update Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
       }
     }
 
@@ -479,6 +481,7 @@ const DB = {
         const { error } = await supabaseClient.from("km_preorders").delete().eq("id", id);
         if (!error) return { id, status };
         console.warn("DB Layer: Supabase delete preorder failed.", error);
+        alert(`Database Error (Pre-Orders Delete Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
       } else {
         const { error } = await supabaseClient.from("km_preorders").update({ status }).eq("id", id);
         if (!error) {
@@ -489,6 +492,7 @@ const DB = {
           return { id, status };
         }
         console.warn("DB Layer: Supabase updatePreOrderStatus failed.", error);
+        alert(`Database Error (Pre-Orders Update Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
       }
     }
 
