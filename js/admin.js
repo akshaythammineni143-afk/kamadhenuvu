@@ -518,12 +518,12 @@ async function printOrderReceipt(id, type) {
   }
 
   // Open Receipt Print Modal Container
-  const modal = document.getElementById("print-receipt-modal");
-  modal.style.display = "block";
+  const overlay = document.getElementById("print-receipt-overlay");
+  overlay.style.display = "flex";
 }
 
 function closeReceipt() {
-  document.getElementById("print-receipt-modal").style.display = "none";
+  document.getElementById("print-receipt-overlay").style.display = "none";
 }
 
 // simulated WhatsApp status updater link
