@@ -1,5 +1,6 @@
-// Kamadhenu Veg - Supabase Connection Configuration
-window.CONFIG = {
-  sb_url: "",  // Paste your Supabase Project URL here (E.g., "https://xyz.supabase.co")
-  sb_anon: ""  // Paste your Supabase Anon API Key here
-};
+// Kamadhenu Veg - Static Database Configuration Fallback
+// If you host this website online, you can paste your Supabase credentials here 
+// so that all devices (including guest mobile phones) can connect automatically without configuration.
+
+window.CONFIG_SB_URL = "";
+window.CONFIG_SB_ANON = "";

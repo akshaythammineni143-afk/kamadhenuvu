@@ -151,8 +151,18 @@ const DEFAULT_PREP_TIMES = {
 
 // Supabase Connection Client Checker
 let supabaseClient = null;
-const sbUrl = localStorage.getItem("sb_url") || (window.CONFIG && window.CONFIG.sb_url);
-const sbAnon = localStorage.getItem("sb_anon") || (window.CONFIG && window.CONFIG.sb_anon);
+
+// Extract database credentials from URL parameters (for guest mobile QR scans)
+const urlParams = new URLSearchParams(window.location.search);
+const urlSbUrl = urlParams.get("sb_url");
+const urlSbAnon = urlParams.get("sb_anon");
+if (urlSbUrl && urlSbAnon) {
+  localStorage.setItem("sb_url", urlSbUrl);
+  localStorage.setItem("sb_anon", urlSbAnon);
+}
+
+const sbUrl = localStorage.getItem("sb_url") || (window.CONFIG_SB_URL || "");
+const sbAnon = localStorage.getItem("sb_anon") || (window.CONFIG_SB_ANON || "");
 
 if (sbUrl && sbAnon && window.supabase) {
   try {

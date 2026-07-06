@@ -389,6 +389,7 @@
   </div>
 
   <!-- Database & Renderer Script -->
+  <script src="js/config.js"></script>
   <script src="js/db.js"></script>
   <script>
     // Update QR Code and Poster labels based on table selection
@@ -402,12 +403,27 @@
 
       let targetUrl = window.location.href.replace('qr.html', 'index.html');
       
+      const sbUrl = localStorage.getItem("sb_url") || (window.CONFIG_SB_URL || "");
+      const sbAnon = localStorage.getItem("sb_anon") || (window.CONFIG_SB_ANON || "");
+      
+      let params = [];
+      if (tableVal !== 'none') {
+        params.push(`table=${tableVal}`);
+      }
+      if (sbUrl && sbAnon) {
+        params.push(`sb_url=${encodeURIComponent(sbUrl)}`);
+        params.push(`sb_anon=${encodeURIComponent(sbAnon)}`);
+      }
+
+      if (params.length > 0) {
+        targetUrl += '?' + params.join('&');
+      }
+
       if (tableVal === 'none') {
         tableLabel.style.display = 'none';
         title.textContent = 'SCAN & ORDER';
         desc.textContent = "Skip the queue! Scan this code to view our full interactive menu, check today's specials, and pre-order your meals instantly.";
       } else {
-        targetUrl += `?table=${tableVal}`;
         tableLabel.textContent = `TABLE ${tableVal}`;
         tableLabel.style.display = 'block';
         title.textContent = `ORDER TO TABLE ${tableVal}`;
