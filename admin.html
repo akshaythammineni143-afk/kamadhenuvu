@@ -745,11 +745,11 @@
               <div class="form-group">
                 <label>Menu Category *</label>
                 <select id="menu-item-cat" required>
+                  <option value="Mandi">Mandi</option>
+                  <option value="Biryani">Biryani</option>
                   <option value="Starters">Starters</option>
-                  <option value="Soups">Soups</option>
-                  <option value="Main Course">Main Course</option>
-                  <option value="Breads">Breads</option>
-                  <option value="Rice & Noodles">Rice & Noodles</option>
+                  <option value="Grills">Grills</option>
+                  <option value="Shawarma">Shawarma</option>
                   <option value="Desserts">Desserts</option>
                   <option value="Beverages">Beverages</option>
                 </select>
@@ -1087,24 +1087,24 @@ CREATE TABLE km_special (
                 <label style="font-weight:700; border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:5px;">Category Preparation Times (Minutes)</label>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                   <div class="form-group">
+                    <label>Mandi</label>
+                    <input type="number" id="prep-time-mandi" min="1" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Biryani</label>
+                    <input type="number" id="prep-time-biryani" min="1" required>
+                  </div>
+                  <div class="form-group">
                     <label>Starters</label>
                     <input type="number" id="prep-time-starters" min="1" required>
                   </div>
                   <div class="form-group">
-                    <label>Soups</label>
-                    <input type="number" id="prep-time-soups" min="1" required>
+                    <label>Grills</label>
+                    <input type="number" id="prep-time-grills" min="1" required>
                   </div>
                   <div class="form-group">
-                    <label>Main Course</label>
-                    <input type="number" id="prep-time-main" min="1" required>
-                  </div>
-                  <div class="form-group">
-                    <label>Breads</label>
-                    <input type="number" id="prep-time-breads" min="1" required>
-                  </div>
-                  <div class="form-group">
-                    <label>Rice & Noodles</label>
-                    <input type="number" id="prep-time-rice" min="1" required>
+                    <label>Shawarma</label>
+                    <input type="number" id="prep-time-shawarma" min="1" required>
                   </div>
                   <div class="form-group">
                     <label>Desserts</label>

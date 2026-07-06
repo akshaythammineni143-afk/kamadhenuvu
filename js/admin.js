@@ -133,11 +133,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Save prep times
       const prepTimes = {
+        "Mandi": parseInt(document.getElementById("prep-time-mandi").value),
+        "Biryani": parseInt(document.getElementById("prep-time-biryani").value),
         "Starters": parseInt(document.getElementById("prep-time-starters").value),
-        "Soups": parseInt(document.getElementById("prep-time-soups").value),
-        "Main Course": parseInt(document.getElementById("prep-time-main").value),
-        "Breads": parseInt(document.getElementById("prep-time-breads").value),
-        "Rice & Noodles": parseInt(document.getElementById("prep-time-rice").value),
+        "Grills": parseInt(document.getElementById("prep-time-grills").value),
+        "Shawarma": parseInt(document.getElementById("prep-time-shawarma").value),
         "Desserts": parseInt(document.getElementById("prep-time-desserts").value),
         "Beverages": parseInt(document.getElementById("prep-time-beverages").value)
       };
@@ -286,8 +286,36 @@ async function renderOverviewTab() {
   const feedback = await DB.getFeedback();
 
   // Counters
-  const todayStr = new Date().toLocaleDateString();
-  const todayOrders = orders.filter(o => o.createdAt.includes(todayStr));
+  function isToday(dateStr) {
+    if (!dateStr) return false;
+    try {
+      const d = new Date(dateStr);
+      if (!isNaN(d.getTime())) {
+        const now = new Date();
+        return d.getDate() === now.getDate() &&
+               d.getMonth() === now.getMonth() &&
+               d.getFullYear() === now.getFullYear();
+      }
+    } catch (e) {}
+    
+    // Fallback parsing for different separators (e.g. 7-6-2026 or 7/6/2026)
+    const parts = dateStr.split(/[\s,/\-\:]+/);
+    if (parts.length >= 3) {
+      const now = new Date();
+      const day = now.getDate();
+      const month = now.getMonth() + 1;
+      const year = now.getFullYear();
+      const yearShort = String(year).slice(-2);
+      const numParts = parts.map(Number);
+      const hasYear = parts.includes(String(year)) || parts.includes(yearShort) || numParts.includes(year) || numParts.includes(Number(yearShort));
+      const hasMonth = numParts.includes(month);
+      const hasDay = numParts.includes(day);
+      return hasYear && hasMonth && hasDay;
+    }
+    return false;
+  }
+
+  const todayOrders = orders.filter(o => isToday(o.createdAt));
   
   const totalOrdersVal = todayOrders.length;
   const pickupCount = todayOrders.filter(o => o.orderType === "Pickup").length;
@@ -326,11 +354,11 @@ async function renderOverviewTab() {
     catRevenueBox.innerHTML = "";
     
     const categoryTally = {
+      "Mandi": 0,
+      "Biryani": 0,
       "Starters": 0,
-      "Soups": 0,
-      "Main Course": 0,
-      "Breads": 0,
-      "Rice & Noodles": 0,
+      "Grills": 0,
+      "Shawarma": 0,
       "Desserts": 0,
       "Beverages": 0
     };
@@ -898,11 +926,11 @@ async function renderContentSettingsForm() {
 
   // Populate category prep times
   const prepTimes = await DB.getPrepTimes();
+  document.getElementById("prep-time-mandi").value = prepTimes["Mandi"] || 35;
+  document.getElementById("prep-time-biryani").value = prepTimes["Biryani"] || 25;
   document.getElementById("prep-time-starters").value = prepTimes["Starters"] || 15;
-  document.getElementById("prep-time-soups").value = prepTimes["Soups"] || 10;
-  document.getElementById("prep-time-main").value = prepTimes["Main Course"] || 25;
-  document.getElementById("prep-time-breads").value = prepTimes["Breads"] || 5;
-  document.getElementById("prep-time-rice").value = prepTimes["Rice & Noodles"] || 20;
+  document.getElementById("prep-time-grills").value = prepTimes["Grills"] || 30;
+  document.getElementById("prep-time-shawarma").value = prepTimes["Shawarma"] || 10;
   document.getElementById("prep-time-desserts").value = prepTimes["Desserts"] || 10;
   document.getElementById("prep-time-beverages").value = prepTimes["Beverages"] || 5;
 
