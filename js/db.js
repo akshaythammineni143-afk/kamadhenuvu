@@ -139,6 +139,70 @@ const DEFAULT_REVIEWS = [
   { name: "Kiran Kumar", rating: 4, text: "Excellent Shawarma and Grills. The Tandoori Chicken was roasted to perfection. Gets very crowded on weekends, but service is reasonably quick.", date: "3 weeks ago" }
 ];
 
+const now = new Date();
+const timeMinus5 = new Date(now.getTime() - 300000);
+const timeMinus15 = new Date(now.getTime() - 900000);
+const timeMinus2 = new Date(now.getTime() - 120000);
+
+const DEFAULT_ORDERS = [
+  {
+    id: "ord_" + (Date.now() - 300000),
+    orderType: "Dine-In",
+    tableNumber: "3",
+    name: "Akshay",
+    phone: "9876543210",
+    pickupTime: "",
+    notes: "Make it spicy, extra raita.",
+    items: [
+      { id: 4, name: "Special Chicken Mandi", price: 440, qty: 1, category: "Mandi" },
+      { id: 18, name: "Apricot Delight", price: 150, qty: 2, category: "Desserts" }
+    ],
+    totalPrice: 740,
+    prepTime: 35,
+    status: "Received",
+    paymentStatus: "Unpaid",
+    createdAt: timeMinus5.toLocaleString(),
+    estimatedReadyTime: new Date(timeMinus5.getTime() + 35 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  },
+  {
+    id: "ord_" + (Date.now() - 900000),
+    orderType: "Dine-In",
+    tableNumber: "5",
+    name: "Rahul",
+    phone: "9123456789",
+    pickupTime: "",
+    notes: "Double masala.",
+    items: [
+      { id: 10, name: "Single Chicken Biryani", price: 190, qty: 2, category: "Biryani" },
+      { id: 22, name: "Masala Chai", price: 30, qty: 3, category: "Beverages" }
+    ],
+    totalPrice: 470,
+    prepTime: 25,
+    status: "Preparing",
+    paymentStatus: "Paid",
+    createdAt: timeMinus15.toLocaleString(),
+    estimatedReadyTime: new Date(timeMinus15.getTime() + 25 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  },
+  {
+    id: "ord_" + (Date.now() - 120000),
+    orderType: "Pickup",
+    tableNumber: "",
+    name: "Sneha",
+    phone: "9848022338",
+    pickupTime: "12:45 PM",
+    notes: "Pack nicely.",
+    items: [
+      { id: 1, name: "Mutton Mandi (Full)", price: 790, qty: 1, category: "Mandi" }
+    ],
+    totalPrice: 790,
+    prepTime: 35,
+    status: "Received",
+    paymentStatus: "Unpaid",
+    createdAt: timeMinus2.toLocaleString(),
+    estimatedReadyTime: new Date(timeMinus2.getTime() + 35 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  }
+];
+
 const DEFAULT_PREP_TIMES = {
   "Mandi": 35,
   "Biryani": 25,
@@ -196,8 +260,8 @@ const DB = {
     if (!localStorage.getItem("km_reservations")) {
       localStorage.setItem("km_reservations", JSON.stringify([]));
     }
-    if (!localStorage.getItem("km_orders")) {
-      localStorage.setItem("km_orders", JSON.stringify([]));
+    if (!localStorage.getItem("km_orders") || localStorage.getItem("km_orders") === "[]") {
+      localStorage.setItem("km_orders", JSON.stringify(DEFAULT_ORDERS));
     }
     if (!localStorage.getItem("km_feedback")) {
       localStorage.setItem("km_feedback", JSON.stringify([]));
@@ -231,6 +295,13 @@ const DB = {
         const mapped = DEFAULT_REVIEWS.map((r, i) => ({ id: `rev_${i}_${Date.now()}`, ...r }));
         await supabaseClient.from("km_reviews").insert(mapped);
         console.log("DB Layer: Seeded initial guest reviews into Supabase.");
+      }
+
+      // 4. Orders
+      const { data: orderData } = await supabaseClient.from("km_orders").select("id").limit(1);
+      if (!orderData || orderData.length === 0) {
+        await supabaseClient.from("km_orders").insert(DEFAULT_ORDERS);
+        console.log("DB Layer: Seeded initial orders into Supabase.");
       }
     } catch (err) {
       console.warn("DB Layer: Seeding failed (this is normal if tables are not fully set up yet in SQL editor):", err);
