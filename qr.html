@@ -348,6 +348,16 @@
     </div>
   </div>
 
+  <!-- Supabase Credentials Warning Banner (Non-Printable) -->
+  <div id="qr-sb-warning" class="print-control no-print" style="display:none; background-color:#fef3c7; border-left:5px solid #d97706; padding:12px 20px; font-size:12px; color:#92400e; margin-bottom: 20px; flex-direction:column; align-items:flex-start; gap:4px;">
+    <div>
+      <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px; color:#d97706;"></i> <strong>Database Warning: Offline Mode</strong>
+    </div>
+    <div style="font-size:11px; color:#78350f;">
+      No active Supabase configuration detected in your local storage or `js/config.js`! The QR codes generated now will point to a local URL that will only store orders offline in your browser and <strong>will not update the admin portal</strong>. Please navigate to the Admin Dashboard Settings to connect Supabase or fill `js/config.js` before printing.
+    </div>
+  </div>
+
   <!-- A4 Sheet -->
   <div class="sheet">
     <header>
@@ -406,6 +416,12 @@
       const sbUrl = localStorage.getItem("sb_url") || (window.CONFIG_SB_URL || "");
       const sbAnon = localStorage.getItem("sb_anon") || (window.CONFIG_SB_ANON || "");
       
+      // Update warning banner visibility
+      const warnBanner = document.getElementById("qr-sb-warning");
+      if (warnBanner) {
+        warnBanner.style.display = (sbUrl && sbAnon) ? "none" : "flex";
+      }
+
       let params = [];
       if (tableVal !== 'none') {
         params.push(`table=${tableVal}`);

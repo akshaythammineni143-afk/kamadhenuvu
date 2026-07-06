@@ -949,28 +949,31 @@ async function checkNewIncomingOrders() {
   const reservations = await DB.getReservations();
   const allOrdersCount = orders.length + reservations.length;
 
-  if (allOrdersCount > previousOrdersCount) {
+  if (allOrdersCount !== previousOrdersCount) {
+    const wentUp = allOrdersCount > previousOrdersCount;
     previousOrdersCount = allOrdersCount;
     
-    // Play audio chime
-    playNewOrderTone();
+    if (wentUp) {
+      // Play audio chime
+      playNewOrderTone();
 
-    // Visual notification banner showing order origin
-    const alertBanner = document.getElementById("new-notification-alert");
-    const alertMsg = document.getElementById("alert-text-message");
-    
-    if (alertBanner && alertMsg) {
-      const latestOrder = orders[0]; // orders are sorted latest first
-      if (latestOrder) {
-        const isDineIn = latestOrder.orderType === "Dine-In";
-        const detailsStr = isDineIn 
-          ? `New Dine-In Order received for Table ${latestOrder.tableNumber}!` 
-          : `New Pickup Pre-Order received from ${latestOrder.name}!`;
-        alertMsg.textContent = detailsStr;
-      } else {
-        alertMsg.textContent = `New Booking / Reservation request received!`;
+      // Visual notification banner showing order origin
+      const alertBanner = document.getElementById("new-notification-alert");
+      const alertMsg = document.getElementById("alert-text-message");
+      
+      if (alertBanner && alertMsg) {
+        const latestOrder = orders[0]; // orders are sorted latest first
+        if (latestOrder) {
+          const isDineIn = latestOrder.orderType === "Dine-In";
+          const detailsStr = isDineIn 
+            ? `New Dine-In Order received for Table ${latestOrder.tableNumber}!` 
+            : `New Pickup Pre-Order received from ${latestOrder.name}!`;
+          alertMsg.textContent = detailsStr;
+        } else {
+          alertMsg.textContent = `New Booking / Reservation request received!`;
+        }
+        alertBanner.style.display = "flex";
       }
-      alertBanner.style.display = "flex";
     }
 
     // Refresh active tab views
