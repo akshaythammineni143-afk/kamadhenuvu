@@ -151,8 +151,8 @@ const DEFAULT_PREP_TIMES = {
 
 // Supabase Connection Client Checker
 let supabaseClient = null;
-const sbUrl = localStorage.getItem("sb_url");
-const sbAnon = localStorage.getItem("sb_anon");
+const sbUrl = localStorage.getItem("sb_url") || (window.CONFIG && window.CONFIG.sb_url);
+const sbAnon = localStorage.getItem("sb_anon") || (window.CONFIG && window.CONFIG.sb_anon);
 
 if (sbUrl && sbAnon && window.supabase) {
   try {
