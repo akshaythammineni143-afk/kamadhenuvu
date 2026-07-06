@@ -1,4 +1,4 @@
-// Kamadhenu Veg - Customer Site JavaScript Interactions
+// Theth Masala - Customer Site JavaScript Interactions
 
 let cart = [];
 let activeTableNumber = ""; // Stores scanned QR table number
@@ -84,8 +84,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const savedRes = await DB.addReservation(resObj);
 
       // Create WhatsApp Text Template
-      const text = `*Kamadhenu Veg - Table Reservation Request*\n\nName: ${name}\nPhone: ${phone}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} People\nOccasion: ${occasion}\nNotes: ${notes || 'None'}\n\n*Reference ID: ${savedRes.id}*`;
-      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+      const text = `*Theth Masala - Table Reservation Request*\n\nName: ${name}\nPhone: ${phone}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} People\nOccasion: ${occasion}\nNotes: ${notes || 'None'}\n\n*Reference ID: ${savedRes.id}*`;
+      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919000330089";
       const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
       
       // Notify User and Open WhatsApp
@@ -196,8 +196,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fabWa = document.getElementById("fab-wa");
   if (fabWa) {
     fabWa.addEventListener("click", () => {
-      const text = "*Kamadhenu Veg - Table Booking / Catering Inquiry*\n\nHello, I would like to make an inquiry about dine-in table reservations or outdoor catering services.";
-      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+      const text = "*Theth Masala - Table Booking / Catering Inquiry*\n\nHello, I would like to make an inquiry about dine-in table reservations or outdoor catering services.";
+      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919000330089";
       window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, "_blank");
     });
   }
@@ -527,10 +527,10 @@ async function submitPreOrder(event) {
   // Optional: Trigger WhatsApp confirmation message
   const itemsSummary = savedOrder.items.map(i => `${i.name} x${i.qty} (₹${i.price * i.qty})`).join("\n");
   const whatsappText = activeTableNumber 
-    ? `*Kamadhenu Veg - New Dine-In Order*\n\nTable: ${savedOrder.tableNumber}\nName: ${savedOrder.name}\nNotes: ${savedOrder.notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`
-    : `*Kamadhenu Veg - Pre-Order Pickup Booking*\n\nName: ${savedOrder.name}\nPhone: ${savedOrder.phone}\nPickup Time: ${savedOrder.pickupTime}\nEst. Prep Time: ${savedOrder.prepTime} mins\nNotes: ${savedOrder.notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`;
+    ? `*Theth Masala - New Dine-In Order*\n\nTable: ${savedOrder.tableNumber}\nName: ${savedOrder.name}\nNotes: ${savedOrder.notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`
+    : `*Theth Masala - Pre-Order Pickup Booking*\n\nName: ${savedOrder.name}\nPhone: ${savedOrder.phone}\nPickup Time: ${savedOrder.pickupTime}\nEst. Prep Time: ${savedOrder.prepTime} mins\nNotes: ${savedOrder.notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`;
   
-  const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+  const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919000330089";
   const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(whatsappText)}`;
   
   // Open WhatsApp in separate background tab
@@ -824,8 +824,8 @@ function initLeadPopup() {
       sessionStorage.setItem("km_popup_dismissed", "true");
       overlay.style.display = "none";
       
-      const couponText = `*Kamadhenu Veg Welcome Coupon*\n\nHello ${name},\nThank you for signing up! Here is your 10% OFF coupon code for your next dine-in or pickup order:\n\n👉 *WELCOME10*\n\nShow this message to our staff to claim.`;
-      const waUrl = `https://wa.me/${phone.replace(/[^0-9]/g, "") || '919876543210'}?text=${encodeURIComponent(couponText)}`;
+      const couponText = `*Theth Masala Welcome Coupon*\n\nHello ${name},\nThank you for signing up! Here is your 10% OFF coupon code for your next dine-in or pickup order:\n\n👉 *WELCOME10*\n\nShow this message to our staff to claim.`;
+      const waUrl = `https://wa.me/${phone.replace(/[^0-9]/g, "") || '919000330089'}?text=${encodeURIComponent(couponText)}`;
       
       alert("Discount Coupon Issued! Redirecting to WhatsApp to save your Coupon Code.");
       window.open(waUrl, "_blank");

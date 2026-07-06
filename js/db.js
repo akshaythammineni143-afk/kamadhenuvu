@@ -1,30 +1,30 @@
-// Database State Layer supporting Dual-Mode: Supabase & LocalStorage (Unified Orders Edition)
+// Theth Masala - State Layer supporting Dual-Mode: Supabase & LocalStorage (Unified Orders Edition)
 
 const DEFAULT_MENU = [
   {
     id: "m1",
-    name: "Dragon Paneer",
-    price: 320,
+    name: "Crispy Chilli Lotus Stem",
+    price: 469,
     category: "Starters",
-    description: "Crispy paneer cubes tossed in a spicy, sweet, and tangy Indo-Chinese sauce with bell peppers.",
+    description: "Crispy fried lotus stem sliced and tossed in sweet honey chili glaze with bell peppers.",
     image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80",
     bestSeller: true,
     isVeg: true
   },
   {
     id: "m2",
-    name: "Cheese Cigar Rolls",
-    price: 260,
+    name: "Stuffed Paneer Tikka",
+    price: 420,
     category: "Starters",
-    description: "Crispy fried spring rolls stuffed with gooey melted cheese, sweet corn, and herbs.",
+    description: "Succulent cottage cheese slices stuffed with rich mint chutney and clay oven grilled.",
     image: "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?auto=format&fit=crop&w=600&q=80",
     bestSeller: true,
     isVeg: true
   },
   {
     id: "m3",
-    name: "Veg Manchow Soup",
-    price: 180,
+    name: "Veg Spicy Manchow Soup",
+    price: 219,
     category: "Soups",
     description: "A popular hot and spicy Indo-Chinese soup loaded with minced vegetables, topped with crispy noodles.",
     image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
@@ -34,7 +34,7 @@ const DEFAULT_MENU = [
   {
     id: "m4",
     name: "Paneer Butter Masala",
-    price: 320,
+    price: 479,
     category: "Main Course",
     description: "Soft paneer cubes cooked in a rich, creamy, and mildly sweet onion-tomato butter gravy.",
     image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80",
@@ -43,60 +43,60 @@ const DEFAULT_MENU = [
   },
   {
     id: "m5",
-    name: "Nizami Handi",
-    price: 350,
+    name: "Shahi Paneer",
+    price: 450,
     category: "Main Course",
-    description: "Assorted fresh vegetables slow-cooked in a rich, fragrant spinach and cashew nut gravy.",
+    description: "Royal cottage cheese cubes cooked in a sweet cashew nut paste and onion gravy.",
     image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=600&q=80",
     bestSeller: true,
     isVeg: true
   },
   {
     id: "m6",
-    name: "Punjabi Kofta",
-    price: 300,
+    name: "Shahi Kaju Masala",
+    price: 480,
     category: "Main Course",
-    description: "Deep-fried mixed vegetable dumplings simmered in a spiced Punjabi style gravy.",
+    description: "Roasted cashew nuts cooked in a rich, buttery, and mildly spiced yellow gravy.",
     image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80",
     bestSeller: false,
     isVeg: true
   },
   {
     id: "m7",
-    name: "Veg Sizzler",
-    price: 420,
+    name: "Dal Makhani",
+    price: 320,
     category: "Main Course",
-    description: "A sizzling hot platter of grilled cottage cheese, assortment of sautéed veggies, French fries, and rice in BBQ sauce.",
+    description: "Black lentils slow-cooked overnight with spices, butter and fresh cream.",
     image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
     bestSeller: false,
     isVeg: true
   },
   {
     id: "m8",
-    name: "Butter Naan",
-    price: 60,
+    name: "Garlic Naan",
+    price: 90,
     category: "Breads",
-    description: "Soft and fluffy leavened flatbread baked in a tandoor clay oven and glazed generously with butter.",
+    description: "Soft and fluffy leavened flatbread baked in a tandoor, glazed with butter and fresh minced garlic.",
     image: "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=600&q=80",
     bestSeller: false,
     isVeg: true
   },
   {
     id: "m9",
-    name: "Exotic Veg Fried Rice",
-    price: 280,
+    name: "Veg Dum Biryani",
+    price: 429,
     category: "Rice & Noodles",
-    description: "Aromatic basmati rice stir-fried with broccoli, zucchini, baby corn, bell peppers, and fine spices.",
+    description: "Fragrant basmati rice slow-cooked with spiced seasonal vegetables and fresh herbs in Hyderabadi style.",
     image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80",
-    bestSeller: false,
+    bestSeller: true,
     isVeg: true
   },
   {
     id: "m10",
-    name: "Tiramisu (Irani Chai Flavor)",
+    name: "Moong Dal Halwa",
     price: 220,
     category: "Desserts",
-    description: "Our signature fusion dessert: classic Italian ladyfingers soaked in rich, aromatic Hyderabadi Irani Chai infusion.",
+    description: "Classic rich dessert made with split green gram paste, cooked with pure ghee, sugar, and dried nuts.",
     image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=600&q=80",
     bestSeller: true,
     isVeg: true
@@ -104,7 +104,7 @@ const DEFAULT_MENU = [
   {
     id: "m11",
     name: "Mango Lassi",
-    price: 120,
+    price: 140,
     category: "Beverages",
     description: "A refreshing, thick yogurt-based drink flavored with sweet ripe mango pulp and saffron.",
     image: "https://images.unsplash.com/photo-1571006682889-7f8f5f24164b?auto=format&fit=crop&w=600&q=80",
@@ -114,7 +114,7 @@ const DEFAULT_MENU = [
   {
     id: "m12",
     name: "Masala Chai",
-    price: 50,
+    price: 60,
     category: "Beverages",
     description: "Traditional Indian tea brewed with milk, ginger, cardamom, cloves, and aromatic spices.",
     image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80",
@@ -124,19 +124,19 @@ const DEFAULT_MENU = [
 ];
 
 const DEFAULT_SPECIAL = {
-  name: "Tiramisu (Irani Chai Flavor)",
-  price: 220,
-  description: "An extraordinary fusion of rich Italian cream and traditional Hyderabadi Irani Chai. Indulge in the best of both worlds!",
-  image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=600&q=80",
-  badge: "Chef's Masterpiece",
-  discount: "Buy 1 Get 1 (Weekend Only)"
+  name: "Veg Dum Biryani",
+  price: 429,
+  description: "Our special signature basmati rice slow-cooked with fresh garden vegetables and house-spices in a sealed clay pot. Savor the authentic Hyderabadi flavor!",
+  image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80",
+  badge: "Chef's Signature",
+  discount: "10% Off on Pre-Orders"
 };
 
 const DEFAULT_REVIEWS = [
-  { name: "Rahul Sharma", rating: 5, text: "Excellent vegetarian food! The Nizami Handi is out of this world, and the Irani Chai Tiramisu is a must-try. Premium ambiance.", date: "2 days ago" },
-  { name: "Priya Reddy", rating: 4.5, text: "Loved the Cheese Cigar Rolls and Dragon Paneer. Very hygienic and fast service. Great for family dinners!", date: "1 week ago" },
-  { name: "Ankit Verma", rating: 5, text: "The Butter Naan was so soft and fresh. Paneer Butter Masala was perfectly creamy. 10/10 would visit again.", date: "2 weeks ago" },
-  { name: "Suresh Kumar", rating: 4, text: "Best veg restaurant in Narsingi. Lots of space for family dining. Sizzler was good, but was busy on Sunday.", date: "3 weeks ago" }
+  { name: "Rahul Sharma", rating: 5, text: "Excellent dining experience! The Veg Dum Biryani is out of this world, and the Chilli Lotus Stem is a must-try. Premium ambiance near Ocean Park.", date: "2 days ago" },
+  { name: "Priya Reddy", rating: 4.5, text: "Loved the Stuffed Paneer Tikka and Veg Dum Biryani. Very hygienic and fast service. Great for family dinners on Shankarpalli Road!", date: "1 week ago" },
+  { name: "Ankit Verma", rating: 5, text: "The Garlic Naan was so soft and fresh. Paneer Butter Masala was perfectly creamy. Best place in Gandipet area. 10/10 would visit again.", date: "2 weeks ago" },
+  { name: "Suresh Kumar", rating: 4, text: "Best multi-cuisine family restaurant near Kokapet/Gandipet. Large seating area. Biryani was amazing, but gets busy on weekends.", date: "3 weeks ago" }
 ];
 
 const DEFAULT_PREP_TIMES = {
