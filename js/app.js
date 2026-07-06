@@ -1,8 +1,14 @@
 // Kamadhenu Veg - Customer Site JavaScript Interactions
 
 let cart = [];
+let activeTableNumber = ""; // Stores scanned QR table number
+let trackingOrderId = "";
+let trackerPollInterval = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // Check for Table QR Scan parameter in URL
+  detectTableQR();
+
   // Load custom content edits from settings
   loadCustomSettingsContent();
 
@@ -197,6 +203,50 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+// Detect Table QR Scans
+function detectTableQR() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const table = urlParams.get("table");
+
+  if (table) {
+    activeTableNumber = table;
+    
+    // Show table banner
+    const banner = document.getElementById("dine-in-banner");
+    const numSpan = document.getElementById("dine-in-table-number");
+    if (banner && numSpan) {
+      numSpan.textContent = table;
+      banner.style.display = "block";
+    }
+
+    // Modify Pre-Order sidebar to Dine-In Mode
+    const drawerTitle = document.querySelector(".cart-header h3");
+    if (drawerTitle) {
+      drawerTitle.innerHTML = `<i class="fa-solid fa-utensils"></i> Order to Table: Table ${table}`;
+    }
+
+    // Hide Pickup Time selector
+    const timeGroup = document.getElementById("ord-time") ? document.getElementById("ord-time").closest(".form-group") : null;
+    if (timeGroup) {
+      timeGroup.style.display = "none";
+      document.getElementById("ord-time").removeAttribute("required");
+    }
+
+    // Customize fields to optional for table ordering convenience
+    const nameInput = document.getElementById("ord-name");
+    const phoneInput = document.getElementById("ord-phone");
+    if (nameInput) nameInput.removeAttribute("required");
+    if (phoneInput) phoneInput.removeAttribute("required");
+
+    // Modify preorder submit button
+    const submitBtn = document.querySelector("#preorder-form button[type='submit']");
+    if (submitBtn) {
+      submitBtn.className = "btn btn-primary";
+      submitBtn.innerHTML = `<i class="fa-solid fa-check-circle"></i> Send Order to Table ${table}`;
+    }
+  }
+}
+
 // Helper: Open pickup pre-order sidebar
 function openPreOrder() {
   const drawer = document.getElementById("cart-drawer");
@@ -223,7 +273,6 @@ async function renderSpecialSection() {
     if (imgEl) imgEl.src = special.image;
     
     if (addBtn) {
-      // Re-bind click event
       addBtn.onclick = async () => {
         await addToCart({
           id: "special_item",
@@ -294,7 +343,7 @@ async function renderMenuGrid(category = "all", searchQuery = "") {
           ${isOut ? `
             <button class="btn btn-secondary" style="width:100%; cursor:not-allowed; opacity:0.6; padding: 8px;" disabled>Currently Unavailable</button>
           ` : `
-            <button class="btn btn-primary" onclick="addToCartById('${item.id}')" style="width:100%; padding: 8px;"><i class="fa-solid fa-plus-circle"></i> Add to Pre-Order</button>
+            <button class="btn btn-primary" onclick="addToCartById('${item.id}')" style="width:100%; padding: 8px;"><i class="fa-solid fa-plus-circle"></i> Add to Cart</button>
           `}
         </div>
       </div>
@@ -370,10 +419,9 @@ async function updateCartUI() {
     total += itemTotal;
     totalQtyCount += item.qty;
 
-    // Resolve category and get prep time
     let cat = item.category;
-    if (cat === "Special") cat = "Main Course"; // Fallback for Today's special
-    const itemPrep = prepTimes[cat] || 15; // default 15 mins fallback
+    if (cat === "Special") cat = "Main Course";
+    const itemPrep = prepTimes[cat] || 15;
     if (itemPrep > maxPrepTime) {
       maxPrepTime = itemPrep;
     }
@@ -400,14 +448,13 @@ async function updateCartUI() {
   totalLabel.textContent = `₹${total}`;
   countBadge.textContent = totalQtyCount;
   
-  // Show computed prep time
   if (prepRow && prepVal) {
     prepVal.textContent = `${maxPrepTime} mins`;
     prepRow.style.display = "flex";
   }
 }
 
-// Pre-Order Submit
+// Order Submission Handler
 async function submitPreOrder(event) {
   event.preventDefault();
   if (cart.length === 0) {
@@ -415,12 +462,13 @@ async function submitPreOrder(event) {
     return;
   }
 
-  const name = document.getElementById("ord-name").value;
-  const phone = document.getElementById("ord-phone").value;
-  const time = document.getElementById("ord-time").value;
-  const notes = document.getElementById("ord-notes").value;
+  // Retrieve inputs
+  const nameVal = document.getElementById("ord-name").value.trim();
+  const phoneVal = document.getElementById("ord-phone").value.trim();
+  const notesVal = document.getElementById("ord-notes").value.trim();
+  const timeVal = activeTableNumber ? "" : document.getElementById("ord-time").value;
 
-  // Retrieve calculated prep time
+  // Retrieve prep time
   const prepTimes = await DB.getPrepTimes();
   let maxPrepTime = 0;
   cart.forEach(item => {
@@ -430,17 +478,16 @@ async function submitPreOrder(event) {
     if (itemPrep > maxPrepTime) maxPrepTime = itemPrep;
   });
 
-  // Warn if pickup time selected is too early
-  if (time) {
+  // Warn if pickup time selected is too early (Only for pickup flow)
+  if (!activeTableNumber && timeVal) {
     const now = new Date();
-    const [pHR, pMIN] = time.split(":").map(Number);
+    const [pHR, pMIN] = timeVal.split(":").map(Number);
     const pickupDate = new Date();
     pickupDate.setHours(pHR, pMIN, 0, 0);
     
     const diffMs = pickupDate - now;
     const diffMins = Math.floor(diffMs / 60000);
     
-    // Check if pickup is today and if diff is less than prep time
     if (diffMins > 0 && diffMins < maxPrepTime) {
       if (!confirm(`⚠️ Warning: preparing this order requires about ${maxPrepTime} minutes. Your chosen pickup time is in only ${diffMins} minutes.\n\nDo you want to submit anyway?`)) {
         return;
@@ -448,34 +495,200 @@ async function submitPreOrder(event) {
     }
   }
 
+  // Compile Unified Order Object
   const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-  const itemsSummary = cart.map(i => `${i.name} x${i.qty} (₹${i.price * i.qty})`).join("\n");
-
   const orderObj = {
-    name,
-    phone,
-    pickupTime: time,
-    notes,
+    orderType: activeTableNumber ? "Dine-In" : "Pickup",
+    tableNumber: activeTableNumber,
+    name: nameVal || (activeTableNumber ? "Table " + activeTableNumber : "Guest"),
+    phone: phoneVal || "",
+    pickupTime: timeVal,
+    notes: notesVal,
     items: cart,
     totalPrice: total,
-    prepTime: maxPrepTime
+    prepTime: maxPrepTime,
+    status: "Received",
+    paymentStatus: "Unpaid"
   };
 
-  const savedOrder = await DB.addPreOrder(orderObj);
+  const savedOrder = await DB.addOrder(orderObj);
 
-  // Generate simulated WhatsApp order link
-  const text = `*Kamadhenu Veg - Pre-Order Pickup Booking*\n\nName: ${name}\nPhone: ${phone}\nPickup Time: ${time}\nEst. Prep Time: ${maxPrepTime} mins\nSpecial Notes: ${notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`;
-  const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
-  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
+  // Close Side drawer
+  document.getElementById("cart-drawer").classList.remove("open");
 
-  alert(`Pre-Order Placed Successfully! Your Order ID is: ${savedOrder.id}. Est. Prep Time: ${maxPrepTime} mins. We are redirecting you to WhatsApp to complete confirmation.`);
-  window.open(waUrl, "_blank");
-
-  // Reset Cart and Form
+  // Show live confirmation and trigger real-time order tracker
   cart = [];
   await updateCartUI();
   document.getElementById("preorder-form").reset();
-  document.getElementById("cart-drawer").classList.remove("open");
+  
+  // Launch tracker modal overlay
+  launchOrderTracker(savedOrder.id);
+
+  // Optional: Trigger WhatsApp confirmation message
+  const itemsSummary = savedOrder.items.map(i => `${i.name} x${i.qty} (₹${i.price * i.qty})`).join("\n");
+  const whatsappText = activeTableNumber 
+    ? `*Kamadhenu Veg - New Dine-In Order*\n\nTable: ${savedOrder.tableNumber}\nName: ${savedOrder.name}\nNotes: ${savedOrder.notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`
+    : `*Kamadhenu Veg - Pre-Order Pickup Booking*\n\nName: ${savedOrder.name}\nPhone: ${savedOrder.phone}\nPickup Time: ${savedOrder.pickupTime}\nEst. Prep Time: ${savedOrder.prepTime} mins\nNotes: ${savedOrder.notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`;
+  
+  const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(whatsappText)}`;
+  
+  // Open WhatsApp in separate background tab
+  setTimeout(() => {
+    window.open(waUrl, "_blank");
+  }, 1000);
+}
+
+// 10. Live Status order tracker functions
+async function launchOrderTracker(orderId) {
+  trackingOrderId = orderId;
+  const overlay = document.getElementById("order-tracker-overlay");
+  if (!overlay) return;
+
+  overlay.style.display = "flex";
+  
+  // Run initial polling render
+  await pollTrackerStatus();
+
+  // Set Interval to poll every 3 seconds
+  if (trackerPollInterval) clearInterval(trackerPollInterval);
+  trackerPollInterval = setInterval(pollTrackerStatus, 3000);
+}
+
+async function pollTrackerStatus() {
+  if (!trackingOrderId) return;
+  const orders = await DB.getOrders();
+  const order = orders.find(o => o.id === trackingOrderId);
+  
+  if (!order) {
+    closeOrderTracker();
+    return;
+  }
+
+  // Update ID label
+  document.getElementById("tracker-order-id").textContent = `Order ID: ${order.id}`;
+
+  // Update Type Details
+  const typeSpan = document.getElementById("tracker-type");
+  const isDineIn = order.orderType === "Dine-In";
+  typeSpan.textContent = isDineIn ? `Dine-In (Table ${order.tableNumber})` : "Pre-Order & Pickup";
+  typeSpan.style.color = isDineIn ? "var(--primary)" : "var(--accent)";
+
+  // Update estimated ready time
+  document.getElementById("tracker-ready-time").textContent = order.estimatedReadyTime;
+
+  // Calculate remaining countdown minutes
+  const countdownBox = document.getElementById("tracker-countdown-row");
+  const countdownSpan = document.getElementById("tracker-countdown");
+  
+  if (order.status === "Completed" || order.status === "Served" || order.status === "Picked Up") {
+    countdownBox.style.display = "none";
+  } else {
+    countdownBox.style.display = "flex";
+    
+    // Compute remaining minutes
+    const now = new Date();
+    // Parse estimatedReadyTime (E.g. "10:45 PM" or "10:45 AM")
+    const [timeStr, ampm] = order.estimatedReadyTime.split(" ");
+    let [hr, min] = timeStr.split(":").map(Number);
+    if (ampm === "PM" && hr < 12) hr += 12;
+    if (ampm === "AM" && hr === 12) hr = 0;
+    
+    const targetDate = new Date();
+    targetDate.setHours(hr, min, 0, 0);
+
+    const diffMs = targetDate - now;
+    const diffMins = Math.ceil(diffMs / 60000);
+
+    if (diffMins <= 0) {
+      countdownSpan.textContent = "Serving shortly...";
+      countdownSpan.style.color = "var(--primary)";
+    } else {
+      countdownSpan.textContent = `${diffMins} mins`;
+      countdownSpan.style.color = "var(--accent)";
+    }
+  }
+
+  // Update Progress Nodes and status label titles
+  const nodeServingLabel = document.getElementById("node-serving-label");
+  const nodeCompletedLabel = document.getElementById("node-completed-label");
+  
+  if (isDineIn) {
+    nodeServingLabel.textContent = "Serving Soon";
+    nodeCompletedLabel.textContent = "Served";
+  } else {
+    nodeServingLabel.textContent = "Ready";
+    nodeCompletedLabel.textContent = "Picked Up";
+  }
+
+  // Map active progress states
+  const nReceived = document.getElementById("node-received");
+  const nPreparing = document.getElementById("node-preparing");
+  const nServing = document.getElementById("node-serving");
+  const nCompleted = document.getElementById("node-completed");
+  const progLine = document.getElementById("tracker-progress-line");
+  const statusTitle = document.getElementById("tracker-status-title");
+  const contextMsg = document.getElementById("tracker-context-msg");
+  const statusIcon = document.getElementById("tracker-status-icon");
+
+  // Reset classes
+  const nodes = [nReceived, nPreparing, nServing, nCompleted];
+  nodes.forEach(n => {
+    n.classList.remove("active-node");
+    n.style.backgroundColor = "#e2e8f0";
+    n.style.color = "#475569";
+    n.style.boxShadow = "none";
+  });
+
+  // Toggle spinners
+  statusIcon.className = "fa-solid fa-circle-notch fa-spin";
+  statusIcon.style.color = "var(--primary)";
+
+  const setNodeActive = (node) => {
+    node.style.backgroundColor = "var(--primary)";
+    node.style.color = "white";
+    node.style.boxShadow = "0 0 0 4px rgba(30,70,32,0.2)";
+  };
+
+  const status = order.status;
+  statusTitle.textContent = status;
+
+  if (status === "Received") {
+    setNodeActive(nReceived);
+    progLine.style.width = "0%";
+    contextMsg.textContent = isDineIn ? `"Your order has been accepted."` : `"Your order has been received."`;
+  } else if (status === "Preparing") {
+    setNodeActive(nReceived);
+    setNodeActive(nPreparing);
+    progLine.style.width = "33%";
+    contextMsg.textContent = isDineIn ? `"Our chefs are preparing your food."` : `"Your food is being prepared."`;
+  } else if (status === "Serving Soon" || status === "Ready for Pickup" || status === "Ready") {
+    setNodeActive(nReceived);
+    setNodeActive(nPreparing);
+    setNodeActive(nServing);
+    progLine.style.width = "66%";
+    contextMsg.textContent = isDineIn ? `"Your food will arrive at your table shortly."` : `"Your food is ready. Please collect your order."`;
+  } else if (status === "Completed" || status === "Served" || status === "Picked Up") {
+    setNodeActive(nReceived);
+    setNodeActive(nPreparing);
+    setNodeActive(nServing);
+    setNodeActive(nCompleted);
+    progLine.style.width = "100%";
+    contextMsg.textContent = isDineIn ? `"Enjoy your meal! Served fresh to your table."` : `"Enjoy your food! Thank you for dining with us."`;
+    
+    // Stop spin icon
+    statusIcon.className = "fa-solid fa-circle-check";
+    statusIcon.style.color = "#16a34a";
+  }
+}
+
+function closeOrderTracker() {
+  document.getElementById("order-tracker-overlay").style.display = "none";
+  if (trackerPollInterval) {
+    clearInterval(trackerPollInterval);
+    trackerPollInterval = null;
+  }
+  trackingOrderId = "";
 }
 
 // 11. Render Reviews
@@ -525,7 +738,6 @@ function updateOperatingHoursHighlight() {
   const currentHour = now.getHours();
   const currentMin = now.getMinutes();
 
-  // Highlight current day in list
   if (hoursList) {
     const listItems = hoursList.querySelectorAll("li");
     listItems.forEach(li => {
@@ -536,7 +748,6 @@ function updateOperatingHoursHighlight() {
     });
   }
 
-  // Operating Hours: 12:30 PM (12.5 hrs) to 11:45 PM (23.75 hrs)
   const openTimeInMinutes = 12 * 60 + 30;
   const closeTimeInMinutes = 23 * 60 + 45;
   const nowTimeInMinutes = currentHour * 60 + currentMin;
@@ -578,19 +789,16 @@ function initLeadPopup() {
   const leadForm = document.getElementById("lead-form");
   if (!overlay) return;
 
-  // Check if popup was already submitted or closed in this session
   if (sessionStorage.getItem("km_popup_dismissed") === "true") {
     return;
   }
 
-  // Fire after 12 seconds
   setTimeout(() => {
     if (sessionStorage.getItem("km_popup_dismissed") !== "true") {
       overlay.style.display = "flex";
     }
   }, 12000);
 
-  // Trigger on Exit Intent (Mouse leaves top of screen)
   document.addEventListener("mouseleave", (e) => {
     if (e.clientY < 20) {
       if (sessionStorage.getItem("km_popup_dismissed") !== "true") {
@@ -599,7 +807,6 @@ function initLeadPopup() {
     }
   });
 
-  // Close Event
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       overlay.style.display = "none";
@@ -607,7 +814,6 @@ function initLeadPopup() {
     });
   }
 
-  // Submit Lead Form
   if (leadForm) {
     leadForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -618,7 +824,6 @@ function initLeadPopup() {
       sessionStorage.setItem("km_popup_dismissed", "true");
       overlay.style.display = "none";
       
-      // WhatsApp Coupon redirect
       const couponText = `*Kamadhenu Veg Welcome Coupon*\n\nHello ${name},\nThank you for signing up! Here is your 10% OFF coupon code for your next dine-in or pickup order:\n\n👉 *WELCOME10*\n\nShow this message to our staff to claim.`;
       const waUrl = `https://wa.me/${phone.replace(/[^0-9]/g, "") || '919876543210'}?text=${encodeURIComponent(couponText)}`;
       
@@ -646,7 +851,6 @@ function showLoyaltyProgress(lead) {
   userTitle.textContent = `Hello, ${lead.name || 'Valued Guest'}!`;
   memberSince.textContent = `Rewards Member Since: ${lead.joinDate}`;
   
-  // Calculate reward progress
   const visits = lead.visits || 0;
   const progressVal = lead.rewardsProgress || (visits % 10);
   const remaining = 10 - progressVal;
@@ -654,11 +858,9 @@ function showLoyaltyProgress(lead) {
   visitsCount.textContent = `${visits} total meals completed`;
   remainingMeals.textContent = remaining === 0 || visits === 0 ? "You have a FREE meal waiting!" : `${remaining} more visits to your FREE meal!`;
 
-  // Update progress bar width
   const percent = progressVal * 10;
   bar.style.width = `${percent}%`;
 
-  // Draw Stamps Visual Grid
   stampsGrid.innerHTML = "";
   for (let i = 1; i <= 10; i++) {
     const stampDiv = document.createElement("div");
@@ -674,7 +876,6 @@ function showLoyaltyProgress(lead) {
     stampsGrid.appendChild(stampDiv);
   }
 
-  // Check eligibility notification (if progress is completed)
   if (progressVal === 0 && visits > 0) {
     notification.style.display = "block";
   } else {
@@ -705,3 +906,5 @@ window.openPreOrder = openPreOrder;
 window.openLightbox = openLightbox;
 window.closeLightbox = closeLightbox;
 window.submitPreOrder = submitPreOrder;
+window.closeOrderTracker = closeOrderTracker;
+window.launchOrderTracker = launchOrderTracker;

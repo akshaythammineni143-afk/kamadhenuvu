@@ -608,7 +608,7 @@
       <!-- ==================================================== -->
       <div class="tab-page active" id="tab-overview">
         <!-- Stats Counters Row -->
-        <div class="stats-grid">
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
           <div class="stat-card">
             <div class="stat-info">
               <h3 id="stat-orders-count">0</h3>
@@ -618,24 +618,45 @@
           </div>
           <div class="stat-card">
             <div class="stat-info">
+              <h3 id="stat-dinein-count">0</h3>
+              <p>🟢 Dine-In Orders</p>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-utensils" style="color: #22c55e;"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 id="stat-pickup-count">0</h3>
+              <p>🔵 Pickup Orders</p>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-truck-pickup" style="color: #3b82f6;"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 id="stat-active-count">0</h3>
+              <p>Active Prep Orders</p>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-fire" style="color: #c084fc;"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 id="stat-completed-count">0</h3>
+              <p>Completed Orders</p>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-circle-check" style="color: #22c55e;"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3 id="stat-avg-prep">15m</h3>
+              <p>Avg Prep Time</p>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-hourglass-half" style="color: #ff8c00;"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
               <h3 id="stat-revenue-count">₹0</h3>
               <p>Estimated Revenue</p>
             </div>
             <div class="stat-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-info">
-              <h3 id="stat-leads-count">0</h3>
-              <p>Customer Leads</p>
-            </div>
-            <div class="stat-icon"><i class="fa-solid fa-user-tag"></i></div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-info">
-              <h3 id="stat-feedback-avg">0.0★</h3>
-              <p>Avg Rating</p>
-            </div>
-            <div class="stat-icon"><i class="fa-regular fa-star-half-stroke"></i></div>
           </div>
         </div>
 
@@ -665,6 +686,17 @@
           <div style="display:flex; gap:10px;">
             <button class="action-btn btn-blue" onclick="exportOrdersToCSV()"><i class="fa-solid fa-file-export"></i> Export Orders (CSV)</button>
           </div>
+        </div>
+
+        <!-- Order Filters Row -->
+        <div class="category-tabs" id="admin-order-filters" style="margin-bottom: 20px; justify-content: flex-start; gap: 8px;">
+          <button class="tab-btn active" data-filter="all" onclick="filterAdminOrders('all')">All Orders</button>
+          <button class="tab-btn" data-filter="pickup" onclick="filterAdminOrders('pickup')">🔵 Pickup Orders</button>
+          <button class="tab-btn" data-filter="dinein" onclick="filterAdminOrders('dinein')">🟢 Dine-In Orders</button>
+          <button class="tab-btn" data-filter="Preparing" onclick="filterAdminOrders('Preparing')">Preparing</button>
+          <button class="tab-btn" data-filter="Ready" onclick="filterAdminOrders('Ready')">Ready</button>
+          <button class="tab-btn" data-filter="Completed" onclick="filterAdminOrders('Completed')">Completed</button>
+          <button class="tab-btn" data-filter="Cancelled" onclick="filterAdminOrders('Cancelled')">Cancelled</button>
         </div>
 
         <div class="table-container">
@@ -951,19 +983,24 @@ CREATE TABLE km_menu (
   "isVeg" BOOLEAN DEFAULT true
 );
 
--- Create preorders table
-CREATE TABLE km_preorders (
+-- Create orders table (Pre-Order + Dine-In QR)
+CREATE TABLE km_orders (
   id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  phone TEXT NOT NULL,
-  "pickupTime" TEXT NOT NULL,
+  name TEXT,
+  phone TEXT,
+  "orderType" TEXT NOT NULL,
+  "tableNumber" TEXT,
+  "pickupTime" TEXT,
   notes TEXT,
   "totalPrice" NUMERIC NOT NULL,
-  "prepTime" INTEGER,
-  status TEXT DEFAULT 'Pending',
+  "prepTime" INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'Received',
+  "paymentStatus" TEXT NOT NULL DEFAULT 'Unpaid',
   "createdAt" TEXT NOT NULL,
+  "estimatedReadyTime" TEXT NOT NULL,
   items JSONB NOT NULL
 );
+
 
 -- Create reservations table
 CREATE TABLE km_reservations (

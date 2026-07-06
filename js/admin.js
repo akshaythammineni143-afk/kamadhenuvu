@@ -3,6 +3,7 @@
 let currentRole = "Owner";
 let activeTab = "tab-overview";
 let previousOrdersCount = 0;
+let activeOrderFilter = "all"; // Options: all, pickup, dinein, Preparing, Ready, Completed, Cancelled
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Force passcode login on every page load/refresh
@@ -131,7 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await renderTabContent();
 
   // Initialize previous count for order checking
-  const allOrders = [...await DB.getPreOrders(), ...await DB.getReservations()];
+  const allOrders = [...await DB.getOrders(), ...await DB.getReservations()];
   previousOrdersCount = allOrders.length;
 
   // Set Interval to check for incoming orders & trigger sound notification
@@ -198,7 +199,6 @@ function updateRoleUI() {
   if (badge) {
     badge.textContent = `Role: ${currentRole}`;
     
-    // Customize colors based on privilege role
     if (currentRole === "Owner") badge.style.backgroundColor = "#d4af37";
     else if (currentRole === "Manager") badge.style.backgroundColor = "#0284c7";
     else badge.style.backgroundColor = "#6b7280";
@@ -209,7 +209,6 @@ function updateRoleUI() {
 async function switchTab(tabId) {
   activeTab = tabId;
   
-  // Update classes
   document.querySelectorAll(".nav-menu .nav-item").forEach(item => {
     if (item.getAttribute("data-tab") === tabId) {
       item.classList.add("active");
@@ -226,7 +225,6 @@ async function switchTab(tabId) {
     }
   });
 
-  // Update Title text
   const title = document.getElementById("tab-title-text");
   if (title) {
     if (tabId === "tab-overview") title.textContent = "Overview Statistics & Reports";
@@ -251,7 +249,7 @@ async function renderTabContent() {
   if (activeTab === "tab-special") await populateSpecialForm();
   if (activeTab === "tab-customers") {
     await renderLoyaltyTable();
-    applyCampaignTemplate('diwali'); // default draft preview
+    applyCampaignTemplate('diwali');
   }
   if (activeTab === "tab-settings") {
     await renderFeedbackLog();
@@ -262,35 +260,51 @@ async function renderTabContent() {
 
 // Render Overview Statistics (Tab 1)
 async function renderOverviewTab() {
-  const preorders = await DB.getPreOrders();
+  const orders = await DB.getOrders();
   const reservations = await DB.getReservations();
   const leads = await DB.getLeads();
   const feedback = await DB.getFeedback();
 
-  // Compute counters
-  const totalOrders = preorders.length;
+  // Counters
+  const todayStr = new Date().toLocaleDateString();
+  const todayOrders = orders.filter(o => o.createdAt.includes(todayStr));
   
-  // Total Revenue (Completed & Approved pickup orders totals sum)
-  const revenueVal = preorders
-    .filter(o => o.status === "Completed" || o.status === "Accepted" || o.status === "Preparing" || o.status === "Ready for Pickup")
+  const totalOrdersVal = todayOrders.length;
+  const pickupCount = todayOrders.filter(o => o.orderType === "Pickup").length;
+  const dineInCount = todayOrders.filter(o => o.orderType === "Dine-In").length;
+
+  const activeCount = orders.filter(o => o.status === "Received" || o.status === "Preparing" || o.status === "Serving Soon" || o.status === "Ready for Pickup" || o.status === "Ready").length;
+  const completedCount = orders.filter(o => o.status === "Completed" || o.status === "Served" || o.status === "Picked Up").length;
+
+  // Average Preparation Time calculation
+  const completedOrders = orders.filter(o => o.status === "Completed" || o.status === "Served" || o.status === "Picked Up");
+  const avgPrepVal = completedOrders.length > 0
+    ? Math.round(completedOrders.reduce((acc, o) => acc + (o.prepTime || 15), 0) / completedOrders.length)
+    : 18;
+
+  // Total Revenue (Completed orders sums)
+  const revenueVal = orders
+    .filter(o => o.status === "Completed" || o.status === "Served" || o.status === "Picked Up")
     .reduce((acc, o) => acc + (o.totalPrice || 0), 0);
 
   const avgRatingVal = feedback.length > 0 
     ? (feedback.reduce((acc, f) => acc + f.rating, 0) / feedback.length).toFixed(1) 
-    : "4.2"; // Fallback to Google reviews average
+    : "4.2";
 
   // Update UI stats
-  document.getElementById("stat-orders-count").textContent = totalOrders;
+  document.getElementById("stat-orders-count").textContent = totalOrdersVal;
+  document.getElementById("stat-dinein-count").textContent = dineInCount;
+  document.getElementById("stat-pickup-count").textContent = pickupCount;
+  document.getElementById("stat-active-count").textContent = activeCount;
+  document.getElementById("stat-completed-count").textContent = completedCount;
+  document.getElementById("stat-avg-prep").textContent = `${avgPrepVal}m`;
   document.getElementById("stat-revenue-count").textContent = `₹${revenueVal}`;
-  document.getElementById("stat-leads-count").textContent = leads.length;
-  document.getElementById("stat-feedback-avg").textContent = `${avgRatingVal}★`;
 
   // Draw Revenue by Category Graph
   const catRevenueBox = document.getElementById("chart-category-revenue");
   if (catRevenueBox) {
     catRevenueBox.innerHTML = "";
     
-    // Tally up items sold in orders
     const categoryTally = {
       "Starters": 0,
       "Soups": 0,
@@ -301,11 +315,13 @@ async function renderOverviewTab() {
       "Beverages": 0
     };
 
-    preorders.forEach(order => {
+    orders.forEach(order => {
       if (order.status !== "Cancelled") {
         order.items.forEach(item => {
-          if (categoryTally[item.category] !== undefined) {
-            categoryTally[item.category] += item.price * item.qty;
+          let cat = item.category;
+          if (cat === "Special") cat = "Main Course";
+          if (categoryTally[cat] !== undefined) {
+            categoryTally[cat] += item.price * item.qty;
           }
         });
       }
@@ -335,11 +351,11 @@ async function renderOverviewTab() {
     statusTallyBox.innerHTML = "";
 
     const tally = {
-      "Pending": preorders.filter(o => o.status === "Pending").length + reservations.filter(r => r.status === "Pending").length,
-      "Preparing": preorders.filter(o => o.status === "Preparing").length,
-      "Ready / Approved": preorders.filter(o => o.status === "Ready for Pickup").length + reservations.filter(r => r.status === "Approved").length,
-      "Completed": preorders.filter(o => o.status === "Completed").length + reservations.filter(r => r.status === "Completed").length,
-      "Cancelled": preorders.filter(o => o.status === "Cancelled").length + reservations.filter(r => r.status === "Cancelled").length
+      "Received": orders.filter(o => o.status === "Received").length + reservations.filter(r => r.status === "Pending").length,
+      "Preparing": orders.filter(o => o.status === "Preparing").length,
+      "Ready / Serving": orders.filter(o => o.status === "Ready for Pickup" || o.status === "Serving Soon").length + reservations.filter(r => r.status === "Approved").length,
+      "Completed": orders.filter(o => o.status === "Completed" || o.status === "Served" || o.status === "Picked Up").length + reservations.filter(r => r.status === "Completed").length,
+      "Cancelled": orders.filter(o => o.status === "Cancelled").length + reservations.filter(r => r.status === "Cancelled").length
     };
 
     const maxVal = Math.max(...Object.values(tally), 5);
@@ -347,12 +363,12 @@ async function renderOverviewTab() {
       const val = tally[statusName];
       const pct = (val / maxVal) * 100;
 
-      // Assign custom color mapping
-      let color = "#6b7280"; // Gray
-      if (statusName === "Pending") color = "#d97706"; // Yellow
-      if (statusName === "Preparing") color = "#c084fc"; // Purple
-      if (statusName === "Ready / Approved" || statusName === "Completed") color = "#16a34a"; // Green
-      if (statusName === "Cancelled") color = "#dc2626"; // Red
+      let color = "#6b7280";
+      if (statusName === "Received") color = "#d97706";
+      if (statusName === "Preparing") color = "#c084fc";
+      if (statusName === "Ready / Serving") color = "#16a34a";
+      if (statusName === "Completed") color = "#1e4620";
+      if (statusName === "Cancelled") color = "#dc2626";
 
       const row = document.createElement("div");
       row.className = "bar-row";
@@ -368,6 +384,23 @@ async function renderOverviewTab() {
   }
 }
 
+// Order Filtering Actions
+function filterAdminOrders(filterVal) {
+  activeOrderFilter = filterVal;
+  
+  // Highlight active filter button
+  const filterBtns = document.querySelectorAll("#admin-order-filters .tab-btn");
+  filterBtns.forEach(btn => {
+    if (btn.getAttribute("data-filter") === filterVal) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  renderOrdersTab();
+}
+
 // Render Orders Tab List (Tab 2)
 async function renderOrdersTab() {
   const tbody = document.querySelector("#active-orders-table tbody");
@@ -375,93 +408,137 @@ async function renderOrdersTab() {
 
   tbody.innerHTML = "";
 
-  const preorders = await DB.getPreOrders();
+  const orders = await DB.getOrders();
   const reservations = await DB.getReservations();
 
-  // Combine both arrays with metadata
-  const combined = [
-    ...preorders.map(o => ({ ...o, bookingType: "Pre-Order" })),
-    ...reservations.map(r => ({ ...r, bookingType: "Reservation" }))
+  // Combine arrays
+  let combined = [
+    ...orders.map(o => ({ ...o, entryType: o.orderType })),
+    ...reservations.map(r => ({ ...r, entryType: "Reservation", orderType: "Reservation" }))
   ];
+
+  // Apply Active Filter Category
+  if (activeOrderFilter === "pickup") {
+    combined = combined.filter(o => o.entryType === "Pickup");
+  } else if (activeOrderFilter === "dinein") {
+    combined = combined.filter(o => o.entryType === "Dine-In");
+  } else if (activeOrderFilter === "Preparing") {
+    combined = combined.filter(o => o.status === "Preparing");
+  } else if (activeOrderFilter === "Ready") {
+    combined = combined.filter(o => o.status === "Ready for Pickup" || o.status === "Serving Soon");
+  } else if (activeOrderFilter === "Completed") {
+    combined = combined.filter(o => o.status === "Completed" || o.status === "Served" || o.status === "Picked Up");
+  } else if (activeOrderFilter === "Cancelled") {
+    combined = combined.filter(o => o.status === "Cancelled");
+  }
 
   // Sort by order date/id (latest first)
   combined.sort((a,b) => b.id.split("_")[1] - a.id.split("_")[1]);
 
   if (combined.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 30px; color: var(--text-muted);">No orders or table bookings logged in database yet.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 30px; color: var(--text-muted);">No matching orders or bookings found.</td></tr>`;
     return;
   }
 
   combined.forEach(item => {
-    const isPre = item.bookingType === "Pre-Order";
+    const isPre = item.entryType === "Pickup";
+    const isDineIn = item.entryType === "Dine-In";
+    const isReservation = item.entryType === "Reservation";
     
-    // Details summary formatting
+    // Details summary
     let detailsHtml = "";
-    if (isPre) {
-      detailsHtml = item.items.map(i => `<strong>${i.name}</strong> x${i.qty}`).join(", ");
-      const prepDuration = item.prepTime || 15;
-      detailsHtml += `<br><span style="font-size:11px; color:var(--primary); font-weight:600;"><i class="fa-solid fa-clock"></i> Prep Time: ${prepDuration} mins</span>`;
-      if (item.notes) detailsHtml += `<br><span style="font-size:11px; color:#c2410c;">Note: ${item.notes}</span>`;
-    } else {
+    if (isReservation) {
       detailsHtml = `Table for <strong>${item.guests} People</strong>`;
       if (item.occasion && item.occasion !== "None") detailsHtml += ` (${item.occasion})`;
       if (item.notes) detailsHtml += `<br><span style="font-size:11px; color:#c2410c;">Note: ${item.notes}</span>`;
+    } else {
+      detailsHtml = item.items.map(i => `<strong>${i.name}</strong> x${i.qty}`).join(", ");
+      if (item.notes) detailsHtml += `<br><span style="font-size:11px; color:#c2410c;">Note: ${item.notes}</span>`;
     }
 
-    // Status colors
+    // Schedule DateTime mapping
+    let scheduleHtml = "";
+    if (isReservation) {
+      scheduleHtml = `${item.date} @ ${item.time}`;
+    } else if (isDineIn) {
+      scheduleHtml = `Placed: ${item.createdAt.split(',')[1] || item.createdAt}<br><span style="font-size:10px; color:var(--primary); font-weight:600;"><i class="fa-solid fa-clock"></i> Est. Serving: ${item.estimatedReadyTime}</span>`;
+    } else {
+      scheduleHtml = `Pickup: ${item.pickupTime || 'ASAP'}<br><span style="font-size:10px; color:var(--accent); font-weight:600;"><i class="fa-solid fa-clock"></i> Est. Ready: ${item.estimatedReadyTime}</span>`;
+    }
+
+    // Status classes
     let statusClass = "badge-pending";
     if (item.status === "Accepted" || item.status === "Approved") statusClass = "badge-accepted";
     else if (item.status === "Preparing") statusClass = "badge-preparing";
-    else if (item.status === "Ready for Pickup") statusClass = "badge-pickup";
-    else if (item.status === "Completed") statusClass = "badge-completed";
+    else if (item.status === "Ready for Pickup" || item.status === "Serving Soon") statusClass = "badge-pickup";
+    else if (item.status === "Completed" || item.status === "Served" || item.status === "Picked Up") statusClass = "badge-completed";
     else if (item.status === "Cancelled") statusClass = "badge-cancelled";
 
     // Build Action controls
     let actionsHtml = "";
-    if (item.status === "Pending") {
+    if (item.status === "Received" || item.status === "Pending") {
       actionsHtml = `
-        <button class="action-btn btn-green" onclick="updateStatus('${item.id}', '${isPre ? 'Accepted' : 'Approved'}')"><i class="fa-solid fa-check"></i> Accept</button>
+        <button class="action-btn btn-green" onclick="updateStatus('${item.id}', 'Preparing')"><i class="fa-solid fa-check"></i> Accept</button>
         <button class="action-btn btn-red" onclick="updateStatus('${item.id}', 'Cancelled')"><i class="fa-solid fa-times"></i> Reject</button>
       `;
-    } else if (item.status === "Accepted" || item.status === "Approved") {
-      actionsHtml = `
-        ${isPre ? `<button class="action-btn btn-blue" onclick="updateStatus('${item.id}', 'Preparing')"><i class="fa-solid fa-fire"></i> Start Prep</button>` : ''}
-        <button class="action-btn btn-green" onclick="updateStatus('${item.id}', 'Completed')"><i class="fa-solid fa-circle-check"></i> Complete</button>
-      `;
     } else if (item.status === "Preparing") {
-      actionsHtml = `
-        <button class="action-btn btn-blue" onclick="updateStatus('${item.id}', 'Ready for Pickup')"><i class="fa-solid fa-clipboard-check"></i> Ready</button>
-      `;
+      if (isPre) {
+        actionsHtml = `<button class="action-btn btn-blue" onclick="updateStatus('${item.id}', 'Ready for Pickup')"><i class="fa-solid fa-check"></i> Set Ready</button>`;
+      } else if (isDineIn) {
+        actionsHtml = `<button class="action-btn btn-blue" onclick="updateStatus('${item.id}', 'Serving Soon')"><i class="fa-solid fa-fire"></i> Serving Soon</button>`;
+      } else {
+        actionsHtml = `<button class="action-btn btn-green" onclick="updateStatus('${item.id}', 'Completed')"><i class="fa-solid fa-check"></i> Complete</button>`;
+      }
     } else if (item.status === "Ready for Pickup") {
-      actionsHtml = `
-        <button class="action-btn btn-green" onclick="updateStatus('${item.id}', 'Completed')"><i class="fa-solid fa-circle-check"></i> Hand Over</button>
-      `;
+      actionsHtml = `<button class="action-btn btn-green" onclick="updateStatus('${item.id}', 'Picked Up')"><i class="fa-solid fa-hand-holding"></i> Hand Over</button>`;
+    } else if (item.status === "Serving Soon") {
+      actionsHtml = `<button class="action-btn btn-green" onclick="updateStatus('${item.id}', 'Served')"><i class="fa-solid fa-utensils"></i> Serve to Table</button>`;
     } else {
       actionsHtml = `<span style="color:var(--text-muted); font-size:11px;">Completed</span>`;
     }
 
-    // Append Print receipt & WhatsApp trigger alerts
+    // Payment Status column
+    let paymentHtml = "N/A";
+    if (!isReservation) {
+      const isPaid = item.paymentStatus === "Paid";
+      paymentHtml = `
+        <strong>₹${item.totalPrice}</strong><br>
+        <span style="font-size:10px; color:${isPaid ? '#16a34a' : '#dc2626'}; font-weight:700;">${item.paymentStatus}</span><br>
+        <button class="action-btn btn-gray" style="padding: 2px 5px; font-size: 8px; margin-top:4px;" onclick="togglePaymentStatus('${item.id}', '${item.paymentStatus}')">
+          <i class="fa-solid fa-money-bill"></i> Toggle
+        </button>
+      `;
+    }
+
+    // Badge markers for Origin Type
+    let typeBadgeHtml = "";
+    if (isReservation) {
+      typeBadgeHtml = `<span class="badge" style="background:#f1f5f9; color:#475569;"><i class="fa-solid fa-calendar-days"></i> Booking</span>`;
+    } else if (isDineIn) {
+      typeBadgeHtml = `<span class="badge" style="background:#dcfce7; color:#15803d;"><i class="fa-solid fa-utensils"></i> Table ${item.tableNumber}</span>`;
+    } else {
+      typeBadgeHtml = `<span class="badge" style="background:#e0f2fe; color:#0369a1;"><i class="fa-solid fa-truck-pickup"></i> Pickup</span>`;
+    }
+
+    // Extra receipt and WA buttons
     const extraControls = `
       <div style="margin-top: 8px; display:flex; gap:6px;">
-        <button class="action-btn btn-gray" style="padding: 3px 6px; font-size:9px;" onclick="printOrderReceipt('${item.id}', '${item.bookingType}')"><i class="fa-solid fa-print"></i> Receipt</button>
-        <button class="action-btn btn-blue" style="padding: 3px 6px; font-size:9px; background-color:#25D366" onclick="sendWhatsAppStatusUpdate('${item.id}', '${item.bookingType}')"><i class="fa-brands fa-whatsapp"></i> Update WA</button>
+        <button class="action-btn btn-gray" style="padding: 3px 6px; font-size:9px;" onclick="printOrderReceipt('${item.id}', '${item.orderType}')"><i class="fa-solid fa-print"></i> Receipt</button>
+        ${item.phone ? `<button class="action-btn btn-blue" style="padding: 3px 6px; font-size:9px; background-color:#25D366" onclick="sendWhatsAppStatusUpdate('${item.id}', '${item.orderType}')"><i class="fa-brands fa-whatsapp"></i> Update WA</button>` : ''}
       </div>
     `;
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><strong>${item.id}</strong></td>
-      <td><span style="font-weight:600; color: ${isPre ? 'var(--accent)' : 'var(--primary)'}">${item.bookingType}</span></td>
+      <td>${typeBadgeHtml}</td>
       <td>
-        <strong>${item.name}</strong><br>
-        <span style="font-size:11px; color:var(--text-muted);">${item.phone}</span>
+        <strong>${item.name || 'Dine-In Guest'}</strong><br>
+        <span style="font-size:11px; color:var(--text-muted);">${item.phone || 'No phone'}</span>
       </td>
-      <td>
-        ${isPre ? 'Pickup at:' : 'Reservation:'}<br>
-        <strong>${isPre ? item.pickupTime : `${item.date} @ ${item.time}`}</strong>
-      </td>
+      <td>${scheduleHtml}</td>
       <td>${detailsHtml}</td>
-      <td><strong>₹${isPre ? item.totalPrice : 'N/A (Dine-in)'}</strong></td>
+      <td>${paymentHtml}</td>
       <td><span class="badge ${statusClass}">${item.status}</span></td>
       <td>
         <div style="display:flex; flex-direction:column; gap:4px;">
@@ -474,36 +551,45 @@ async function renderOrdersTab() {
   });
 }
 
-// Update Reservation/Preorder Status
-async function updateStatus(id, newStatus) {
-  const isPre = id.startsWith("ord_");
-  
-  if (isPre) {
-    await DB.updatePreOrderStatus(id, newStatus);
-  } else {
-    await DB.updateReservationStatus(id, newStatus);
-  }
-
-  addAuditLog(`Updated status of ${isPre ? 'Pre-Order' : 'Reservation'} ${id} to "${newStatus}"`, currentRole);
+// Toggle payment status
+async function togglePaymentStatus(id, currentStatus) {
+  const nextStatus = currentStatus === "Paid" ? "Unpaid" : "Paid";
+  await DB.updateOrderPaymentStatus(id, nextStatus);
+  addAuditLog(`Updated payment status of order ${id} to "${nextStatus}"`, currentRole);
   await renderOrdersTab();
-  await renderOverviewTab(); // refresh charts
+  await renderOverviewTab();
 }
 
-// 3. Receipt Generation & Window Print
+// Update Reservation/Preorder Status
+async function updateStatus(id, newStatus) {
+  const isReservation = id.startsWith("res_");
+  
+  if (isReservation) {
+    await DB.updateReservationStatus(id, newStatus);
+  } else {
+    await DB.updateOrderStatus(id, newStatus);
+  }
+
+  addAuditLog(`Updated status of ${isReservation ? 'Reservation' : 'Order'} ${id} to "${newStatus}"`, currentRole);
+  await renderOrdersTab();
+  await renderOverviewTab();
+}
+
+// Receipt Generation & Window Print
 async function printOrderReceipt(id, type) {
-  const isPre = type === "Pre-Order";
-  const orders = isPre ? await DB.getPreOrders() : await DB.getReservations();
+  const isReservation = type === "Reservation";
+  const orders = isReservation ? await DB.getReservations() : await DB.getOrders();
   const order = orders.find(o => o.id === id);
   if (!order) return;
 
   document.getElementById("receipt-date").textContent = `Date: ${order.createdAt}`;
   document.getElementById("receipt-id").textContent = `Booking ID: ${order.id}`;
-  document.getElementById("receipt-customer").textContent = `Customer: ${order.name} (${order.phone})`;
+  document.getElementById("receipt-customer").textContent = `Customer: ${order.name} (${order.phone || 'Dine-In'})`;
 
   const rowsBox = document.getElementById("receipt-items-rows");
   rowsBox.innerHTML = "";
 
-  if (isPre) {
+  if (!isReservation) {
     order.items.forEach(item => {
       const p = document.createElement("p");
       p.style.display = "flex";
@@ -511,7 +597,7 @@ async function printOrderReceipt(id, type) {
       p.innerHTML = `<span>${item.name} x${item.qty}</span> <span>₹${item.price * item.qty}</span>`;
       rowsBox.appendChild(p);
     });
-    document.getElementById("receipt-total").textContent = `Total: ₹${order.totalPrice}`;
+    document.getElementById("receipt-total").textContent = `Total: ₹${order.totalPrice} (${order.paymentStatus})`;
     document.getElementById("receipt-total").style.display = "block";
   } else {
     const p = document.createElement("p");
@@ -529,21 +615,43 @@ function closeReceipt() {
   document.getElementById("print-receipt-overlay").style.display = "none";
 }
 
-// simulated WhatsApp status updater link
+// WhatsApp status updater link
 async function sendWhatsAppStatusUpdate(id, type) {
-  const isPre = type === "Pre-Order";
-  const orders = isPre ? await DB.getPreOrders() : await DB.getReservations();
+  const isReservation = type === "Reservation";
+  const orders = isReservation ? await DB.getReservations() : await DB.getOrders();
   const order = orders.find(o => o.id === id);
   if (!order) return;
 
-  const msg = `*Kamadhenu Veg Status Alert*\n\nHello ${order.name},\nYour ${type} Booking (*${order.id}*) status has been updated to: 👉 *${order.status}*\n\nPickup Time: ${isPre ? order.pickupTime : `${order.date} @ ${order.time}`}.\nThank you for choosing Kamadhenu Veg!`;
-  const waUrl = `https://wa.me/${order.phone.replace(/[^0-9]/g, "") || '919876543210'}?text=${encodeURIComponent(msg)}`;
+  let msg = "";
+  if (isReservation) {
+    msg = `*Kamadhenu Veg Booking Alert*\n\nHello ${order.name},\nYour table booking reservation status is: *${order.status}*.\n\nThank you for choosing Kamadhenu Veg!`;
+  } else {
+    // Custom messages per order type
+    if (order.orderType === "Dine-In") {
+      if (order.status === "Preparing") {
+        msg = `*Kamadhenu Veg Order Update*\n\nHi ${order.name},\nOur chefs are preparing your food. It will be served shortly to Table ${order.tableNumber}!`;
+      } else if (order.status === "Serving Soon") {
+        msg = `*Kamadhenu Veg Order Update*\n\nHi ${order.name},\nYour food is cooked and will arrive at your table shortly!`;
+      } else {
+        msg = `*Kamadhenu Veg Order Update*\n\nHi ${order.name},\nYour order at Table ${order.tableNumber} is status: *${order.status}*.\n\nEnjoy your meal!`;
+      }
+    } else {
+      if (order.status === "Preparing") {
+        msg = `*Kamadhenu Veg Order Update*\n\nHi ${order.name},\nYour pickup order is being prepared. Est ready time: ${order.estimatedReadyTime}.`;
+      } else if (order.status === "Ready for Pickup") {
+        msg = `*Kamadhenu Veg Order Update*\n\nHi ${order.name},\nYour food is ready! Please collect your order from our Narsingi counter.`;
+      } else {
+        msg = `*Kamadhenu Veg Order Update*\n\nHi ${order.name},\nYour pickup order status is: *${order.status}*.\n\nThank you!`;
+      }
+    }
+  }
 
+  const waUrl = `https://wa.me/${order.phone.replace(/[^0-9]/g, "") || '919876543210'}?text=${encodeURIComponent(msg)}`;
   alert("Redirecting to WhatsApp to send status notification update message.");
   window.open(waUrl, "_blank");
 }
 
-// 4. Menu catalog management tab (Tab 3)
+// Menu catalog management tab (Tab 3)
 async function renderMenuCatalog() {
   const tbody = document.querySelector("#menu-catalog-table tbody");
   if (!tbody) return;
@@ -595,7 +703,7 @@ async function deleteMenuItem(id) {
     await DB.saveMenu(menu);
     addAuditLog(`Deleted Menu Item: "${item.name}"`, currentRole);
     await renderMenuCatalog();
-    await renderOverviewTab(); // refresh category tallies
+    await renderOverviewTab();
   }
 }
 
@@ -605,7 +713,7 @@ function resetMenuForm() {
   document.getElementById("menu-editor-form").reset();
 }
 
-// 5. Today's Special Tab (Tab 4)
+// Today's Special Tab (Tab 4)
 async function populateSpecialForm() {
   const special = await DB.getSpecial();
   if (special) {
@@ -618,7 +726,7 @@ async function populateSpecialForm() {
   }
 }
 
-// 6. Loyalty Program & Campaigns (Tab 5)
+// Loyalty Program & Campaigns (Tab 5)
 async function renderLoyaltyTable() {
   const tbody = document.querySelector("#loyalty-customers-table tbody");
   if (!tbody) return;
@@ -627,7 +735,7 @@ async function renderLoyaltyTable() {
   const leads = await DB.getLeads();
 
   if (leads.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No registered customer leads found in local storage.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No registered customer leads found.</td></tr>`;
     return;
   }
 
@@ -694,7 +802,7 @@ function applyCampaignTemplate(type) {
   box.value = text;
 }
 
-// Trigger simulated campaigns logs
+// Trigger promotional campaign
 async function triggerCampaign(event) {
   event.preventDefault();
   if (!checkPermission("Manager")) return;
@@ -726,7 +834,7 @@ async function triggerCampaign(event) {
   });
 }
 
-// 7. Settings & Feedbacks Tab (Tab 6)
+// Settings & Feedbacks Tab (Tab 6)
 async function renderFeedbackLog() {
   const tbody = document.querySelector("#feedback-log-table tbody");
   if (!tbody) return;
@@ -788,7 +896,7 @@ async function renderContentSettingsForm() {
   }
 }
 
-// 8. Dashboard Audit Action Logging
+// Dashboard Audit Action Logging
 function initAuditLogs() {
   if (!localStorage.getItem("km_audit_logs")) {
     localStorage.setItem("km_audit_logs", JSON.stringify([
@@ -827,24 +935,33 @@ function clearAuditLogs() {
   }
 }
 
-// 9. Real-Time incoming order checking & synth audio trigger notifications
+// Real-Time incoming order checking & synth audio trigger notifications
 async function checkNewIncomingOrders() {
-  const allOrders = [...await DB.getPreOrders(), ...await DB.getReservations()];
-  const currentCount = allOrders.length;
+  const orders = await DB.getOrders();
+  const reservations = await DB.getReservations();
+  const allOrdersCount = orders.length + reservations.length;
 
-  if (currentCount > previousOrdersCount) {
-    // New Order detected!
-    const diff = currentCount - previousOrdersCount;
-    previousOrdersCount = currentCount;
+  if (allOrdersCount > previousOrdersCount) {
+    previousOrdersCount = allOrdersCount;
     
-    // Trigger audio notification
+    // Play audio chime
     playNewOrderTone();
 
-    // Trigger visual notification banner
+    // Visual notification banner showing order origin
     const alertBanner = document.getElementById("new-notification-alert");
     const alertMsg = document.getElementById("alert-text-message");
+    
     if (alertBanner && alertMsg) {
-      alertMsg.textContent = `New Order / Reservation request received! Total new items: ${diff}. Refreshing tab tables.`;
+      const latestOrder = orders[0]; // orders are sorted latest first
+      if (latestOrder) {
+        const isDineIn = latestOrder.orderType === "Dine-In";
+        const detailsStr = isDineIn 
+          ? `New Dine-In Order received for Table ${latestOrder.tableNumber}!` 
+          : `New Pickup Pre-Order received from ${latestOrder.name}!`;
+        alertMsg.textContent = detailsStr;
+      } else {
+        alertMsg.textContent = `New Booking / Reservation request received!`;
+      }
       alertBanner.style.display = "flex";
     }
 
@@ -862,24 +979,22 @@ function playNewOrderTone() {
   try {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
-    // First high tone
     const osc1 = audioCtx.createOscillator();
     const gain1 = audioCtx.createGain();
     osc1.connect(gain1);
     gain1.connect(audioCtx.destination);
-    osc1.frequency.value = 523.25; // C5 note
+    osc1.frequency.value = 523.25;
     gain1.gain.setValueAtTime(0.2, audioCtx.currentTime);
     osc1.start();
     gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
     osc1.stop(audioCtx.currentTime + 0.3);
 
-    // Second higher tone delayed by 150ms
     setTimeout(() => {
       const osc2 = audioCtx.createOscillator();
       const gain2 = audioCtx.createGain();
       osc2.connect(gain2);
       gain2.connect(audioCtx.destination);
-      osc2.frequency.value = 659.25; // E5 note
+      osc2.frequency.value = 659.25;
       gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
       osc2.start();
       gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
@@ -887,7 +1002,7 @@ function playNewOrderTone() {
     }, 150);
 
   } catch (err) {
-    console.warn("Web Audio Context not permitted or supported yet in this browser session:", err);
+    console.warn("Web Audio Context not permitted or supported yet:", err);
   }
 }
 
@@ -896,18 +1011,19 @@ function playSynthTestSound() {
   alert("Simulated Audio Synth Note triggered via Web Audio API!");
 }
 
-// 10. Data Exporters (CSV compilation and browser download triggers)
+// CSV Data Exporters
 async function exportOrdersToCSV() {
-  const preorders = await DB.getPreOrders();
-  let csv = "Order ID,Type,Customer Name,Phone,Date/Time,Total Price,Status\n";
+  const orders = await DB.getOrders();
+  const reservations = await DB.getReservations();
+  
+  let csv = "Order ID,Type,Table Number,Customer Name,Phone,Date/Time,Total Price,Payment Status,Status\n";
 
-  preorders.forEach(o => {
-    csv += `"${o.id}","Pre-Order","${o.name}","${o.phone}","${o.pickupTime}","₹${o.totalPrice}","${o.status}"\n`;
+  orders.forEach(o => {
+    csv += `"${o.id}","${o.orderType}","Table ${o.tableNumber || 'N/A'}","${o.name}","${o.phone || 'N/A'}","${o.createdAt}","₹${o.totalPrice}","${o.paymentStatus}","${o.status}"\n`;
   });
 
-  const reservations = await DB.getReservations();
   reservations.forEach(r => {
-    csv += `"${r.id}","Reservation","${r.name}","${r.phone}","${r.date} @ ${r.time}","Dine-in","${r.status}"\n`;
+    csv += `"${r.id}","Reservation","N/A","${r.name}","${r.phone}","${r.date} @ ${r.time}","Dine-in","N/A","${r.status}"\n`;
   });
 
   triggerCSVDownload(csv, "Kamadhenu_Orders_Export.csv");
@@ -997,3 +1113,5 @@ window.clearAuditLogs = clearAuditLogs;
 window.saveSupabaseConfig = saveSupabaseConfig;
 window.disconnectSupabase = disconnectSupabase;
 window.copySQLSchema = copySQLSchema;
+window.filterAdminOrders = filterAdminOrders;
+window.togglePaymentStatus = togglePaymentStatus;

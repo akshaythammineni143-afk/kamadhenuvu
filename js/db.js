@@ -1,4 +1,4 @@
-// Database State Layer supporting Dual-Mode: Supabase & LocalStorage
+// Database State Layer supporting Dual-Mode: Supabase & LocalStorage (Unified Orders Edition)
 
 const DEFAULT_MENU = [
   {
@@ -186,8 +186,8 @@ const DB = {
     if (!localStorage.getItem("km_reservations")) {
       localStorage.setItem("km_reservations", JSON.stringify([]));
     }
-    if (!localStorage.getItem("km_preorders")) {
-      localStorage.setItem("km_preorders", JSON.stringify([]));
+    if (!localStorage.getItem("km_orders")) {
+      localStorage.setItem("km_orders", JSON.stringify([]));
     }
     if (!localStorage.getItem("km_feedback")) {
       localStorage.setItem("km_feedback", JSON.stringify([]));
@@ -218,7 +218,6 @@ const DB = {
       // 3. Reviews
       const { data: revData } = await supabaseClient.from("km_reviews").select("id").limit(1);
       if (!revData || revData.length === 0) {
-        // Map ids to reviews
         const mapped = DEFAULT_REVIEWS.map((r, i) => ({ id: `rev_${i}_${Date.now()}`, ...r }));
         await supabaseClient.from("km_reviews").insert(mapped);
         console.log("DB Layer: Seeded initial guest reviews into Supabase.");
@@ -277,7 +276,6 @@ const DB = {
     if (this.isSupabase()) {
       const { data, error } = await supabaseClient.from("km_reviews").select("*");
       if (!error && data) {
-        // Sort descending by id timestamp
         return data.sort((a,b) => b.id.split("_")[1] - a.id.split("_")[1]);
       }
       console.warn("DB Layer: Supabase getReviews failed.", error);
@@ -386,6 +384,7 @@ const DB = {
         return newRes;
       }
       console.warn("DB Layer: Supabase addReservation failed.", error);
+      alert(`Database Error (Reservations Insert Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
     }
 
     this.initLocal();
@@ -437,81 +436,144 @@ const DB = {
     return null;
   },
 
-  // ---------------- PICKUP PRE-ORDERS ----------------
-  async getPreOrders() {
+  // ---------------- UNIFIED ORDERS (Pre-Order + Dine-In QR) ----------------
+  async getOrders() {
     if (this.isSupabase()) {
-      const { data, error } = await supabaseClient.from("km_preorders").select("*");
+      const { data, error } = await supabaseClient.from("km_orders").select("*");
       if (!error && data) {
         return data.sort((a,b) => b.id.split("_")[1] - a.id.split("_")[1]);
       }
-      console.warn("DB Layer: Supabase getPreOrders failed.", error);
+      console.warn("DB Layer: Supabase getOrders failed.", error);
     }
     this.initLocal();
-    return JSON.parse(localStorage.getItem("km_preorders"));
+    
+    // Backwards compatibility migration check:
+    if (!localStorage.getItem("km_orders")) {
+      const oldPreorders = localStorage.getItem("km_preorders");
+      if (oldPreorders) {
+        // Migrate old preorders format to unified km_orders
+        const migrated = JSON.parse(oldPreorders).map(o => ({
+          orderType: "Pickup",
+          tableNumber: "",
+          paymentStatus: "Unpaid",
+          estimatedReadyTime: new Date(Date.parse(o.createdAt) + (o.prepTime || 15) * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          ...o
+        }));
+        localStorage.setItem("km_orders", JSON.stringify(migrated));
+        localStorage.removeItem("km_preorders");
+      } else {
+        localStorage.setItem("km_orders", JSON.stringify([]));
+      }
+    }
+    return JSON.parse(localStorage.getItem("km_orders"));
   },
 
-  async addPreOrder(order) {
+  // For backward compatibility alias mapping
+  async getPreOrders() {
+    return this.getOrders();
+  },
+
+  async addOrder(order) {
+    // Compute Estimated Ready Time
+    const now = new Date();
+    const readyDate = new Date(now.getTime() + (order.prepTime || 15) * 60000);
+    const estReadyStr = readyDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     const newOrder = {
       id: "ord_" + Date.now(),
-      status: "Pending",
-      createdAt: new Date().toLocaleString(),
+      status: "Received",
+      paymentStatus: "Unpaid",
+      createdAt: now.toLocaleString(),
+      estimatedReadyTime: estReadyStr,
+      tableNumber: order.tableNumber || "",
+      pickupTime: order.pickupTime || "",
       ...order
     };
 
     if (this.isSupabase()) {
-      const { error } = await supabaseClient.from("km_preorders").insert(newOrder);
+      const { error } = await supabaseClient.from("km_orders").insert(newOrder);
       if (!error) {
-        await this.addLead(order.name, order.phone);
+        if (order.phone) {
+          await this.addLead(order.name || "QR Guest", order.phone);
+        }
         return newOrder;
       }
-      console.warn("DB Layer: Supabase addPreOrder failed.", error);
+      console.warn("DB Layer: Supabase addOrder failed.", error);
+      alert(`Database Error (Orders Insert Failed): ${error.message}\nEnsure your Supabase project contains the 'km_orders' table.`);
     }
 
     this.initLocal();
-    const preorders = JSON.parse(localStorage.getItem("km_preorders"));
-    preorders.unshift(newOrder);
-    localStorage.setItem("km_preorders", JSON.stringify(preorders));
-    this.addLead(order.name, order.phone);
+    const orders = JSON.parse(localStorage.getItem("km_orders"));
+    orders.unshift(newOrder);
+    localStorage.setItem("km_orders", JSON.stringify(orders));
+    if (order.phone) {
+      this.addLead(order.name || "QR Guest", order.phone);
+    }
     return newOrder;
   },
 
-  async updatePreOrderStatus(id, status) {
+  async updateOrderStatus(id, status) {
     if (this.isSupabase()) {
       if (status === "Cancelled") {
-        const { error } = await supabaseClient.from("km_preorders").delete().eq("id", id);
+        const { error } = await supabaseClient.from("km_orders").delete().eq("id", id);
         if (!error) return { id, status };
-        console.warn("DB Layer: Supabase delete preorder failed.", error);
-        alert(`Database Error (Pre-Orders Delete Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
+        console.warn("DB Layer: Supabase delete order failed.", error);
+        alert(`Database Error (Orders Delete Failed): ${error.message}`);
       } else {
-        const { error } = await supabaseClient.from("km_preorders").update({ status }).eq("id", id);
+        const { error } = await supabaseClient.from("km_orders").update({ status }).eq("id", id);
         if (!error) {
-          const { data: ord } = await supabaseClient.from("km_preorders").select("phone").eq("id", id).single();
-          if (status === "Completed" && ord) {
+          const { data: ord } = await supabaseClient.from("km_orders").select("phone").eq("id", id).single();
+          if ((status === "Completed" || status === "Served" || status === "Picked Up") && ord && ord.phone) {
             await this.incrementVisits(ord.phone);
           }
           return { id, status };
         }
-        console.warn("DB Layer: Supabase updatePreOrderStatus failed.", error);
-        alert(`Database Error (Pre-Orders Update Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
+        console.warn("DB Layer: Supabase updateOrderStatus failed.", error);
+        alert(`Database Error (Orders Status Update Failed): ${error.message}`);
       }
     }
 
     this.initLocal();
-    let preorders = JSON.parse(localStorage.getItem("km_preorders"));
+    let orders = JSON.parse(localStorage.getItem("km_orders"));
     if (status === "Cancelled") {
-      preorders = preorders.filter(o => o.id !== id);
-      localStorage.setItem("km_preorders", JSON.stringify(preorders));
+      orders = orders.filter(o => o.id !== id);
+      localStorage.setItem("km_orders", JSON.stringify(orders));
       return { id, status };
     } else {
-      const ord = preorders.find(o => o.id === id);
+      const ord = orders.find(o => o.id === id);
       if (ord) {
         ord.status = status;
-        localStorage.setItem("km_preorders", JSON.stringify(preorders));
-        if (status === "Completed") {
+        localStorage.setItem("km_orders", JSON.stringify(orders));
+        if ((status === "Completed" || status === "Served" || status === "Picked Up") && ord.phone) {
           this.incrementVisits(ord.phone);
         }
         return ord;
       }
+    }
+    return null;
+  },
+
+  // Backward compatibility wrapper aliases mapping
+  async addPreOrder(order) {
+    return this.addOrder({ orderType: "Pickup", ...order });
+  },
+  async updatePreOrderStatus(id, status) {
+    return this.updateOrderStatus(id, status);
+  },
+
+  async updateOrderPaymentStatus(id, paymentStatus) {
+    if (this.isSupabase()) {
+      const { error } = await supabaseClient.from("km_orders").update({ paymentStatus }).eq("id", id);
+      if (!error) return { id, paymentStatus };
+      console.warn("DB Layer: Supabase updateOrderPaymentStatus failed.", error);
+    }
+    this.initLocal();
+    const orders = JSON.parse(localStorage.getItem("km_orders"));
+    const ord = orders.find(o => o.id === id);
+    if (ord) {
+      ord.paymentStatus = paymentStatus;
+      localStorage.setItem("km_orders", JSON.stringify(orders));
+      return ord;
     }
     return null;
   },
@@ -599,7 +661,6 @@ const DB = {
       if (!error && data) {
         return JSON.parse(data.value);
       }
-      // If table exists but key not present, seed it
       try {
         await supabaseClient.from("km_settings").upsert({ key: "prep_times", value: JSON.stringify(DEFAULT_PREP_TIMES) });
         return DEFAULT_PREP_TIMES;

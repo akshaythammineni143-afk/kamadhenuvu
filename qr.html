@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kamadhenu Veg - Digital Menu QR</title>
+  <title>Kamadhenu Veg - Digital Menu QR Generator</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -175,7 +175,9 @@
       border-radius: 12px;
       background: white;
       margin-bottom: 20px;
-      display: inline-block;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .qr-image {
@@ -308,12 +310,41 @@
   <!-- Printable Control Bar -->
   <div class="print-control">
     <div>
-      <h3 style="font-family: 'Outfit', sans-serif; font-size: 16px;">Printable QR Menu</h3>
-      <p style="font-size: 12px; color: #666;">Ready-to-print A4 table stand or wall poster.</p>
+      <h3 style="font-family: 'Outfit', sans-serif; font-size: 16px;">Printable QR Menu Generator</h3>
+      <p style="font-size: 12px; color: #666;">Ready-to-print A4 table stand poster with dynamic table routing.</p>
     </div>
-    <div style="display: flex; gap: 10px;">
-      <a href="index.html" class="btn btn-secondary">← Back to Website</a>
-      <button onclick="window.print()" class="btn btn-primary">🖨️ Print / Save as PDF</button>
+    
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <!-- Table Selector Dropdown -->
+      <div style="display:flex; align-items:center; gap:6px; font-family:'Outfit', sans-serif; font-size:13px; font-weight:600;">
+        <label for="table-select-qr" style="color:var(--dark);">Poster for:</label>
+        <select id="table-select-qr" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc; font-weight:600;" onchange="updateQrForTable()">
+          <option value="none">General Menu (Home Pickup)</option>
+          <option value="1">Table 1</option>
+          <option value="2">Table 2</option>
+          <option value="3">Table 3</option>
+          <option value="4">Table 4</option>
+          <option value="5">Table 5</option>
+          <option value="6">Table 6</option>
+          <option value="7">Table 7</option>
+          <option value="8">Table 8</option>
+          <option value="9">Table 9</option>
+          <option value="10">Table 10</option>
+          <option value="11">Table 11</option>
+          <option value="12">Table 12</option>
+          <option value="13">Table 13</option>
+          <option value="14">Table 14</option>
+          <option value="15">Table 15</option>
+          <option value="16">Table 16</option>
+          <option value="17">Table 17</option>
+          <option value="18">Table 18</option>
+          <option value="19">Table 19</option>
+          <option value="20">Table 20</option>
+        </select>
+      </div>
+
+      <a href="admin.html" class="btn btn-secondary">← Back to Admin</a>
+      <button onclick="window.print()" class="btn btn-primary">🖨️ Print Poster</button>
     </div>
   </div>
 
@@ -333,11 +364,12 @@
 
       <!-- QR Code and Call to Action Column -->
       <div class="qr-promo-section">
-        <div class="qr-title">SCAN & ORDER</div>
-        <p class="qr-text" style="margin-bottom: 12px;">Skip the queue! Scan this code to view our full interactive menu, check today's specials, and pre-order your meals instantly.</p>
+        <div class="qr-title" id="poster-qr-title">SCAN & ORDER</div>
+        <p class="qr-text" id="poster-qr-desc" style="margin-bottom: 12px;">Skip the queue! Scan this code to view our full interactive menu, check today's specials, and pre-order your meals instantly.</p>
         
         <div class="qr-box">
           <img id="qr-img" class="qr-image" src="" alt="Kamadhenu Veg QR Menu">
+          <div id="table-label-poster" style="display:none; margin-top: 10px; font-family:'Outfit', sans-serif; font-size: 24px; font-weight:800; color: var(--primary); letter-spacing:1px; border-top: 2px solid var(--secondary); padding-top: 5px;">TABLE 1</div>
         </div>
         
         <div class="features-list">
@@ -359,44 +391,73 @@
   <!-- Database & Renderer Script -->
   <script src="js/db.js"></script>
   <script>
-    // Generate QR code matching current URL (or fallback to dummy restaurant url)
-    const currentUrl = window.location.href.replace('qr.html', 'index.html');
-    const qrImage = document.getElementById('qr-img');
-    qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentUrl)}&color=1e4620`;
+    // Update QR Code and Poster labels based on table selection
+    function updateQrForTable() {
+      const select = document.getElementById('table-select-qr');
+      const tableVal = select.value;
+      const qrImage = document.getElementById('qr-img');
+      const tableLabel = document.getElementById('table-label-poster');
+      const title = document.getElementById('poster-qr-title');
+      const desc = document.getElementById('poster-qr-desc');
+
+      let targetUrl = window.location.href.replace('qr.html', 'index.html');
+      
+      if (tableVal === 'none') {
+        tableLabel.style.display = 'none';
+        title.textContent = 'SCAN & ORDER';
+        desc.textContent = "Skip the queue! Scan this code to view our full interactive menu, check today's specials, and pre-order your meals instantly.";
+      } else {
+        targetUrl += `?table=${tableVal}`;
+        tableLabel.textContent = `TABLE ${tableVal}`;
+        tableLabel.style.display = 'block';
+        title.textContent = `ORDER TO TABLE ${tableVal}`;
+        desc.textContent = `Settle in! Scan this code to browse the menu, add items, and place your order directly to Table ${tableVal} in seconds.`;
+      }
+
+      qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(targetUrl)}&color=1e4620`;
+    }
+
+    // Initialize with default General Menu QR
+    updateQrForTable();
 
     // Render categorized menu
-    const menuItems = DB.getMenu();
-    const categories = ["Starters", "Soups", "Main Course", "Breads", "Rice & Noodles", "Desserts"];
-    const container = document.getElementById('menu-section');
+    async function renderPrintableMenu() {
+      const menuItems = await DB.getMenu();
+      const categories = ["Starters", "Soups", "Main Course", "Breads", "Rice & Noodles", "Desserts"];
+      const container = document.getElementById('menu-section');
+      container.innerHTML = "";
 
-    categories.forEach(cat => {
-      const items = menuItems.filter(item => item.category === cat);
-      if (items.length > 0) {
-        const catBlock = document.createElement('div');
-        catBlock.className = 'category-block';
-        
-        let html = `<h4 class="category-title">${cat}</h4>`;
-        
-        // Take max 4 items per category for printable spacing constraints
-        items.slice(0, 4).forEach(item => {
-          html += `
-            <div class="menu-item">
-              <span class="item-name">
-                <span class="veg-icon"></span>
-                ${item.name}
-                ${item.bestSeller ? '<span style="font-size:9px; color:#b8860b; font-weight:bold; margin-left:4px;">★</span>' : ''}
-              </span>
-              <span class="item-dots"></span>
-              <span class="item-price">₹${item.price}</span>
-            </div>
-            <p class="item-desc">${item.description}</p>
-          `;
-        });
+      categories.forEach(cat => {
+        const items = menuItems.filter(item => item.category === cat);
+        if (items.length > 0) {
+          const catBlock = document.createElement('div');
+          catBlock.className = 'category-block';
+          
+          let html = `<h4 class="category-title">${cat}</h4>`;
+          
+          // Take max 4 items per category for printable spacing constraints
+          items.slice(0, 4).forEach(item => {
+            html += `
+              <div class="menu-item">
+                <span class="item-name">
+                  <span class="veg-icon"></span>
+                  ${item.name}
+                  ${item.bestSeller ? '<span style="font-size:9px; color:#b8860b; font-weight:bold; margin-left:4px;">★</span>' : ''}
+                </span>
+                <span class="item-dots"></span>
+                <span class="item-price">₹${item.price}</span>
+              </div>
+              <p class="item-desc">${item.description}</p>
+            `;
+          });
 
-        catBlock.innerHTML = html;
-        container.appendChild(catBlock);
-      }
-    });
+          catBlock.innerHTML = html;
+          container.appendChild(catBlock);
+        }
+      });
+    }
+
+    renderPrintableMenu();
   </script>
 </body>
 </html>
