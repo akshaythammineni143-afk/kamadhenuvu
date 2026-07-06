@@ -5,9 +5,29 @@ let activeTab = "tab-overview";
 let previousOrdersCount = 0;
 let activeOrderFilter = "all"; // Options: all, pickup, dinein, Preparing, Ready, Completed, Cancelled
 
+function updateConnectionStatusUI() {
+  const dbStatus = document.getElementById("db-connection-status");
+  if (dbStatus) {
+    if (DB.isSupabase()) {
+      dbStatus.style.backgroundColor = "#e6f4ea";
+      dbStatus.style.color = "#137333";
+      dbStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> DB Connected`;
+      dbStatus.title = "Live database sync active. Orders will update automatically across all devices.";
+    } else {
+      dbStatus.style.backgroundColor = "#fce8e6";
+      dbStatus.style.color = "#c5221f";
+      dbStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Offline (Local Mode)`;
+      dbStatus.title = "Offline local mode: Orders placed on guests' phones will NOT sync until you connect Supabase in Settings.";
+    }
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   // Force passcode login on every page load/refresh
   sessionStorage.removeItem("km_admin_auth");
+
+  // Check connection status
+  updateConnectionStatusUI();
 
   // Check auth
   checkSessionAuth();

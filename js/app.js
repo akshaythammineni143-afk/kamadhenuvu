@@ -9,6 +9,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Check for Table QR Scan parameter in URL
   detectTableQR();
 
+  // Show local mode notice if database is offline
+  const localNotice = document.getElementById("local-mode-notice");
+  if (localNotice) {
+    localNotice.style.display = DB.isSupabase() ? "none" : "block";
+  }
+
   // Load custom content edits from settings
   loadCustomSettingsContent();
 

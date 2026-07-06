@@ -371,7 +371,11 @@ const DB = {
     if (this.isSupabase()) {
       const { data, error } = await supabaseClient.from("km_reservations").select("*");
       if (!error && data) {
-        return data.sort((a,b) => {
+        const normalized = data.map(r => ({
+          ...r,
+          createdAt: r.createdAt !== undefined ? r.createdAt : r.createdat
+        }));
+        return normalized.sort((a,b) => {
           const idA = a && a.id ? a.id.split("_")[1] : "";
           const idB = b && b.id ? b.id.split("_")[1] : "";
           return (parseInt(idB) || 0) - (parseInt(idA) || 0);
@@ -459,7 +463,19 @@ const DB = {
     if (this.isSupabase()) {
       const { data, error } = await supabaseClient.from("km_orders").select("*");
       if (!error && data) {
-        return data.sort((a,b) => {
+        const normalized = data.map(o => ({
+          ...o,
+          orderType: o.orderType !== undefined ? o.orderType : o.ordertype,
+          tableNumber: o.tableNumber !== undefined ? o.tableNumber : o.tablenumber,
+          pickupTime: o.pickupTime !== undefined ? o.pickupTime : o.pickuptime,
+          totalPrice: o.totalPrice !== undefined ? o.totalPrice : o.totalprice,
+          prepTime: o.prepTime !== undefined ? o.prepTime : o.preptime,
+          paymentStatus: o.paymentStatus !== undefined ? o.paymentStatus : o.paymentstatus,
+          createdAt: o.createdAt !== undefined ? o.createdAt : o.createdat,
+          estimatedReadyTime: o.estimatedReadyTime !== undefined ? o.estimatedReadyTime : o.estimatedreadytime,
+          items: typeof o.items === "string" ? JSON.parse(o.items) : o.items
+        }));
+        return normalized.sort((a,b) => {
           const idA = a && a.id ? a.id.split("_")[1] : "";
           const idB = b && b.id ? b.id.split("_")[1] : "";
           return (parseInt(idB) || 0) - (parseInt(idA) || 0);
