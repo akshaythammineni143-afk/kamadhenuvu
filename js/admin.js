@@ -433,7 +433,11 @@ async function renderOrdersTab() {
   }
 
   // Sort by order date/id (latest first)
-  combined.sort((a,b) => b.id.split("_")[1] - a.id.split("_")[1]);
+  combined.sort((a,b) => {
+    const idA = a && a.id ? a.id.split("_")[1] : "";
+    const idB = b && b.id ? b.id.split("_")[1] : "";
+    return (parseInt(idB) || 0) - (parseInt(idA) || 0);
+  });
 
   if (combined.length === 0) {
     tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 30px; color: var(--text-muted);">No matching orders or bookings found.</td></tr>`;
@@ -448,22 +452,26 @@ async function renderOrdersTab() {
     // Details summary
     let detailsHtml = "";
     if (isReservation) {
-      detailsHtml = `Table for <strong>${item.guests} People</strong>`;
+      detailsHtml = `Table for <strong>${item.guests || 0} People</strong>`;
       if (item.occasion && item.occasion !== "None") detailsHtml += ` (${item.occasion})`;
       if (item.notes) detailsHtml += `<br><span style="font-size:11px; color:#c2410c;">Note: ${item.notes}</span>`;
     } else {
-      detailsHtml = item.items.map(i => `<strong>${i.name}</strong> x${i.qty}`).join(", ");
+      const itemsList = Array.isArray(item.items) 
+        ? item.items 
+        : (typeof item.items === 'string' ? JSON.parse(item.items) : []);
+      detailsHtml = itemsList.map(i => `<strong>${i.name}</strong> x${i.qty}`).join(", ");
       if (item.notes) detailsHtml += `<br><span style="font-size:11px; color:#c2410c;">Note: ${item.notes}</span>`;
     }
 
     // Schedule DateTime mapping
     let scheduleHtml = "";
     if (isReservation) {
-      scheduleHtml = `${item.date} @ ${item.time}`;
+      scheduleHtml = `${item.date || ''} @ ${item.time || ''}`;
     } else if (isDineIn) {
-      scheduleHtml = `Placed: ${item.createdAt.split(',')[1] || item.createdAt}<br><span style="font-size:10px; color:var(--primary); font-weight:600;"><i class="fa-solid fa-clock"></i> Est. Serving: ${item.estimatedReadyTime}</span>`;
+      const createdStr = item.createdAt || "";
+      scheduleHtml = `Placed: ${createdStr.includes(',') ? createdStr.split(',')[1] : createdStr}<br><span style="font-size:10px; color:var(--primary); font-weight:600;"><i class="fa-solid fa-clock"></i> Est. Serving: ${item.estimatedReadyTime || 'N/A'}</span>`;
     } else {
-      scheduleHtml = `Pickup: ${item.pickupTime || 'ASAP'}<br><span style="font-size:10px; color:var(--accent); font-weight:600;"><i class="fa-solid fa-clock"></i> Est. Ready: ${item.estimatedReadyTime}</span>`;
+      scheduleHtml = `Pickup: ${item.pickupTime || 'ASAP'}<br><span style="font-size:10px; color:var(--accent); font-weight:600;"><i class="fa-solid fa-clock"></i> Est. Ready: ${item.estimatedReadyTime || 'N/A'}</span>`;
     }
 
     // Status classes

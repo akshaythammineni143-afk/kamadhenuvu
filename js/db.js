@@ -371,9 +371,17 @@ const DB = {
     if (this.isSupabase()) {
       const { data, error } = await supabaseClient.from("km_reservations").select("*");
       if (!error && data) {
-        return data.sort((a,b) => b.id.split("_")[1] - a.id.split("_")[1]);
+        return data.sort((a,b) => {
+          const idA = a && a.id ? a.id.split("_")[1] : "";
+          const idB = b && b.id ? b.id.split("_")[1] : "";
+          return (parseInt(idB) || 0) - (parseInt(idA) || 0);
+        });
       }
       console.warn("DB Layer: Supabase getReservations failed.", error);
+      if (!window.hasAlertedReservationsError) {
+        window.hasAlertedReservationsError = true;
+        alert(`Database Error (Get Reservations Failed): ${error.message}\nThis means the 'km_reservations' table might be missing or blocked in your Supabase project.`);
+      }
     }
     this.initLocal();
     return JSON.parse(localStorage.getItem("km_reservations"));
@@ -451,9 +459,17 @@ const DB = {
     if (this.isSupabase()) {
       const { data, error } = await supabaseClient.from("km_orders").select("*");
       if (!error && data) {
-        return data.sort((a,b) => b.id.split("_")[1] - a.id.split("_")[1]);
+        return data.sort((a,b) => {
+          const idA = a && a.id ? a.id.split("_")[1] : "";
+          const idB = b && b.id ? b.id.split("_")[1] : "";
+          return (parseInt(idB) || 0) - (parseInt(idA) || 0);
+        });
       }
       console.warn("DB Layer: Supabase getOrders failed.", error);
+      if (!window.hasAlertedOrdersError) {
+        window.hasAlertedOrdersError = true;
+        alert(`Database Error (Get Orders Failed): ${error.message}\nThis means the 'km_orders' table is likely missing in your Supabase project. Go to Tab 6 (Settings) on the admin portal, copy the SQL script, and run it in your Supabase SQL Editor.`);
+      }
     }
     this.initLocal();
     
