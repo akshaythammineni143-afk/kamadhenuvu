@@ -490,32 +490,19 @@ const DB = {
 
   async updateReservationStatus(id, status) {
     if (this.isSupabase()) {
-      if (status === "Cancelled") {
-        const { error } = await supabaseClient.from("km_reservations").delete().eq("id", id);
-        if (!error) return { id, status };
-        console.warn("DB Layer: Supabase delete reservation failed.", error);
-        alert(`Database Error (Reservations Delete Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
-      } else {
-        const { error } = await supabaseClient.from("km_reservations").update({ status }).eq("id", id);
-        if (!error) {
-          const { data: res } = await supabaseClient.from("km_reservations").select("phone").eq("id", id).single();
-          if (status === "Completed" && res) {
-            await this.incrementVisits(res.phone);
-          }
-          return { id, status };
+      const { error } = await supabaseClient.from("km_reservations").update({ status }).eq("id", id);
+      if (!error) {
+        const { data: res } = await supabaseClient.from("km_reservations").select("phone").eq("id", id).single();
+        if (status === "Completed" && res) {
+          await this.incrementVisits(res.phone);
         }
-        console.warn("DB Layer: Supabase updateReservationStatus failed.", error);
-        alert(`Database Error (Reservations Update Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
+        return { id, status };
       }
-    }
-
-    this.initLocal();
-    let reservations = JSON.parse(localStorage.getItem("km_reservations"));
-    if (status === "Cancelled") {
-      reservations = reservations.filter(r => r.id !== id);
-      localStorage.setItem("km_reservations", JSON.stringify(reservations));
-      return { id, status };
+      console.warn("DB Layer: Supabase updateReservationStatus failed.", error);
+      alert(`Database Error (Reservations Update Failed): ${error.message}\nEnsure your tables have Row Level Security (RLS) disabled or appropriate policies configured.`);
     } else {
+      this.initLocal();
+      let reservations = JSON.parse(localStorage.getItem("km_reservations"));
       const res = reservations.find(r => r.id === id);
       if (res) {
         res.status = status;
@@ -627,32 +614,19 @@ const DB = {
 
   async updateOrderStatus(id, status) {
     if (this.isSupabase()) {
-      if (status === "Cancelled") {
-        const { error } = await supabaseClient.from("km_orders").delete().eq("id", id);
-        if (!error) return { id, status };
-        console.warn("DB Layer: Supabase delete order failed.", error);
-        alert(`Database Error (Orders Delete Failed): ${error.message}`);
-      } else {
-        const { error } = await supabaseClient.from("km_orders").update({ status }).eq("id", id);
-        if (!error) {
-          const { data: ord } = await supabaseClient.from("km_orders").select("phone").eq("id", id).single();
-          if ((status === "Completed" || status === "Served" || status === "Picked Up") && ord && ord.phone) {
-            await this.incrementVisits(ord.phone);
-          }
-          return { id, status };
+      const { error } = await supabaseClient.from("km_orders").update({ status }).eq("id", id);
+      if (!error) {
+        const { data: ord } = await supabaseClient.from("km_orders").select("phone").eq("id", id).single();
+        if ((status === "Completed" || status === "Served" || status === "Picked Up") && ord && ord.phone) {
+          await this.incrementVisits(ord.phone);
         }
-        console.warn("DB Layer: Supabase updateOrderStatus failed.", error);
-        alert(`Database Error (Orders Status Update Failed): ${error.message}`);
+        return { id, status };
       }
-    }
-
-    this.initLocal();
-    let orders = JSON.parse(localStorage.getItem("km_orders"));
-    if (status === "Cancelled") {
-      orders = orders.filter(o => o.id !== id);
-      localStorage.setItem("km_orders", JSON.stringify(orders));
-      return { id, status };
+      console.warn("DB Layer: Supabase updateOrderStatus failed.", error);
+      alert(`Database Error (Orders Status Update Failed): ${error.message}`);
     } else {
+      this.initLocal();
+      let orders = JSON.parse(localStorage.getItem("km_orders"));
       const ord = orders.find(o => o.id === id);
       if (ord) {
         ord.status = status;
