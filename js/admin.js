@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Check auth
   checkSessionAuth();
+
+  // Check if unified orders table is set up in Supabase
+  await checkSupabaseTableSetup();
   
   // Initialize role
   const roleSel = document.getElementById("role-selector");
@@ -1112,6 +1115,26 @@ window.exportLeadsToCSV = exportLeadsToCSV;
 window.clearAuditLogs = clearAuditLogs;
 window.saveSupabaseConfig = saveSupabaseConfig;
 window.disconnectSupabase = disconnectSupabase;
+async function checkSupabaseTableSetup() {
+  if (DB.isSupabase() && window.supabase) {
+    try {
+      const sbUrl = localStorage.getItem("sb_url");
+      const sbAnon = localStorage.getItem("sb_anon");
+      const client = window.supabase.createClient(sbUrl, sbAnon);
+      
+      const { error } = await client.from("km_orders").select("id").limit(1);
+      if (error && error.message.includes("relation") && error.message.includes("does not exist")) {
+        const warningBanner = document.getElementById("db-warning-banner");
+        if (warningBanner) {
+          warningBanner.style.display = "block";
+        }
+      }
+    } catch (err) {
+      console.warn("Admin verify setup checker error:", err);
+    }
+  }
+}
+
 window.copySQLSchema = copySQLSchema;
 window.filterAdminOrders = filterAdminOrders;
 window.togglePaymentStatus = togglePaymentStatus;

@@ -579,6 +579,11 @@
     <!-- Main Workspace Content Area -->
     <main class="main-content">
       
+      <!-- Critical Table Missing Notification Banner -->
+      <div id="db-warning-banner" style="display:none; background-color: #f8d7da; color: #721c24; padding: 12px 20px; font-size: 13px; font-weight: bold; text-align: center; border-radius: var(--radius-sm); border: 1px solid #f5c6cb; margin-bottom: 20px;">
+        <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px; color: #dc3545;"></i> Warning: The <code>km_orders</code> table is missing in your Supabase database! Please go to the <strong>Feedback & Settings tab</strong>, copy the SQL script, and run it in your Supabase SQL Editor.
+      </div>
+      
       <!-- Top header bar -->
       <div class="content-header">
         <div>
