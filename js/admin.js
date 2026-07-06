@@ -466,10 +466,11 @@ async function renderOrdersTab() {
   ];
 
   // Apply Active Filter Category
+  // Apply Active Filter Category
   if (activeOrderFilter === "pickup") {
-    combined = combined.filter(o => o.entryType === "Pickup");
+    combined = combined.filter(o => o.entryType && o.entryType.toLowerCase().includes("pick"));
   } else if (activeOrderFilter === "dinein") {
-    combined = combined.filter(o => o.entryType === "Dine-In");
+    combined = combined.filter(o => o.entryType && o.entryType.toLowerCase().includes("dine"));
   } else if (activeOrderFilter === "Preparing") {
     combined = combined.filter(o => o.status === "Preparing");
   } else if (activeOrderFilter === "Ready") {
@@ -493,8 +494,8 @@ async function renderOrdersTab() {
   }
 
   combined.forEach(item => {
-    const isPre = item.entryType === "Pickup";
-    const isDineIn = item.entryType === "Dine-In";
+    const isPre = item.entryType && item.entryType.toLowerCase().includes("pick");
+    const isDineIn = item.entryType && item.entryType.toLowerCase().includes("dine");
     const isReservation = item.entryType === "Reservation";
     
     // Details summary
