@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Create WhatsApp Text Template
       const text = `*Pista House - Table Reservation Request*\n\nName: ${name}\nPhone: ${phone}\nDate: ${date}\nTime: ${time}\nGuests: ${guests} People\nOccasion: ${occasion}\nNotes: ${notes || 'None'}\n\n*Reference ID: ${savedRes.id}*`;
-      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "918143227553";
       const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
       
       // Notify User and Open WhatsApp
@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (fabWa) {
     fabWa.addEventListener("click", () => {
       const text = "*Pista House - Table Booking / Catering Inquiry*\n\nHello, I would like to make an inquiry about dine-in table reservations or outdoor catering services.";
-      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+      const waNumber = localStorage.getItem("settings_whatsapp_phone") || "918143227553";
       window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, "_blank");
     });
   }
@@ -536,7 +536,7 @@ async function submitPreOrder(event) {
     ? `*Pista House - New Dine-In Order*\n\nTable: ${savedOrder.tableNumber}\nName: ${savedOrder.name}\nNotes: ${savedOrder.notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`
     : `*Pista House - Pre-Order Pickup Booking*\n\nName: ${savedOrder.name}\nPhone: ${savedOrder.phone}\nPickup Time: ${savedOrder.pickupTime}\nEst. Prep Time: ${savedOrder.prepTime} mins\nNotes: ${savedOrder.notes || 'None'}\n\n*Items Ordered:*\n${itemsSummary}\n\n*Total Amount: ₹${total}*\n\n*Order ID: ${savedOrder.id}*`;
   
-  const waNumber = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+  const waNumber = localStorage.getItem("settings_whatsapp_phone") || "918143227553";
   const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(whatsappText)}`;
   
   // Open WhatsApp in separate background tab
@@ -831,7 +831,7 @@ function initLeadPopup() {
       overlay.style.display = "none";
       
       const couponText = `*Pista House Welcome Coupon*\n\nHello ${name},\nThank you for signing up! Here is your 10% OFF coupon code for your next dine-in or pickup order:\n\n👉 *WELCOME10*\n\nShow this message to our staff to claim.`;
-      const waUrl = `https://wa.me/${phone.replace(/[^0-9]/g, "") || '919876543210'}?text=${encodeURIComponent(couponText)}`;
+      const waUrl = `https://wa.me/${phone.replace(/[^0-9]/g, "") || '918143227553'}?text=${encodeURIComponent(couponText)}`;
       
       alert("Discount Coupon Issued! Redirecting to WhatsApp to save your Coupon Code.");
       window.open(waUrl, "_blank");

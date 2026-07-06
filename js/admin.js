@@ -707,7 +707,7 @@ async function sendWhatsAppStatusUpdate(id, type) {
     }
   }
 
-  const waUrl = `https://wa.me/${order.phone.replace(/[^0-9]/g, "") || '919876543210'}?text=${encodeURIComponent(msg)}`;
+  const waUrl = `https://wa.me/${order.phone.replace(/[^0-9]/g, "") || '918143227553'}?text=${encodeURIComponent(msg)}`;
   alert("Redirecting to WhatsApp to send status notification update message.");
   window.open(waUrl, "_blank");
 }
@@ -923,7 +923,7 @@ async function renderFeedbackLog() {
 async function renderContentSettingsForm() {
   const headline = localStorage.getItem("settings_hero_title") || "Experience Premium Vegetarian Dining in Hyderabad";
   const hoursText = localStorage.getItem("settings_hours_text") || "12:30 PM - 11:45 PM";
-  const whatsappText = localStorage.getItem("settings_whatsapp_phone") || "919876543210";
+  const whatsappText = localStorage.getItem("settings_whatsapp_phone") || "918143227553";
 
   document.getElementById("settings-hero-title").value = headline;
   document.getElementById("settings-hours-text").value = hoursText;

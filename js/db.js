@@ -150,7 +150,7 @@ const DEFAULT_ORDERS = [
     orderType: "Dine-In",
     tableNumber: "3",
     name: "Akshay",
-    phone: "9876543210",
+    phone: "8143227553",
     pickupTime: "",
     notes: "Make it spicy, extra raita.",
     items: [
