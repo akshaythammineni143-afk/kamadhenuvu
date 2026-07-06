@@ -2,7 +2,7 @@
 
 let currentRole = "Owner";
 let activeTab = "tab-overview";
-let previousOrdersCount = 0;
+let previousOrdersHash = "";
 let activeOrderFilter = "all"; // Options: all, pickup, dinein, Preparing, Ready, Completed, Cancelled
 
 function updateConnectionStatusUI() {
@@ -151,9 +151,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Load Initial Tab Data
   await renderTabContent();
 
-  // Initialize previous count for order checking
-  const allOrders = [...await DB.getOrders(), ...await DB.getReservations()];
-  previousOrdersCount = allOrders.length;
+  // Initialize previous orders hash for real-time synchronization
+  const orders = await DB.getOrders();
+  const reservations = await DB.getReservations();
+  previousOrdersHash = JSON.stringify([
+    ...orders.map(o => ({ id: o.id, status: o.status, paymentStatus: o.paymentStatus })),
+    ...reservations.map(r => ({ id: r.id, status: r.status }))
+  ]);
 
   // Set Interval to check for incoming orders & trigger sound notification
   setInterval(checkNewIncomingOrders, 4000);
@@ -996,11 +1000,18 @@ function clearAuditLogs() {
 async function checkNewIncomingOrders() {
   const orders = await DB.getOrders();
   const reservations = await DB.getReservations();
-  const allOrdersCount = orders.length + reservations.length;
 
-  if (allOrdersCount !== previousOrdersCount) {
-    const wentUp = allOrdersCount > previousOrdersCount;
-    previousOrdersCount = allOrdersCount;
+  const currentHash = JSON.stringify([
+    ...orders.map(o => ({ id: o.id, status: o.status, paymentStatus: o.paymentStatus })),
+    ...reservations.map(r => ({ id: r.id, status: r.status }))
+  ]);
+
+  if (currentHash !== previousOrdersHash) {
+    const oldOrdersCount = previousOrdersHash ? JSON.parse(previousOrdersHash).length : 0;
+    const newOrdersCount = orders.length + reservations.length;
+    const wentUp = newOrdersCount > oldOrdersCount;
+    
+    previousOrdersHash = currentHash;
     
     if (wentUp) {
       // Play audio chime
@@ -1013,7 +1024,7 @@ async function checkNewIncomingOrders() {
       if (alertBanner && alertMsg) {
         const latestOrder = orders[0]; // orders are sorted latest first
         if (latestOrder) {
-          const isDineIn = latestOrder.orderType === "Dine-In";
+          const isDineIn = latestOrder.orderType && latestOrder.orderType.toLowerCase().includes("dine");
           const detailsStr = isDineIn 
             ? `New Dine-In Order received for Table ${latestOrder.tableNumber}!` 
             : `New Pickup Pre-Order received from ${latestOrder.name}!`;
