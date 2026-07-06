@@ -1,4 +1,4 @@
-// Theth Masala - Owner & Staff Administration Panel Logic
+// Pista House - Owner & Staff Administration Panel Logic
 
 let currentRole = "Owner";
 let activeTab = "tab-overview";
@@ -632,29 +632,29 @@ async function sendWhatsAppStatusUpdate(id, type) {
 
   let msg = "";
   if (isReservation) {
-    msg = `*Theth Masala Booking Alert*\n\nHello ${order.name},\nYour table booking reservation status is: *${order.status}*.\n\nThank you for choosing Theth Masala!`;
+    msg = `*Pista House Booking Alert*\n\nHello ${order.name},\nYour table booking reservation status is: *${order.status}*.\n\nThank you for choosing Pista House!`;
   } else {
     // Custom messages per order type
     if (order.orderType === "Dine-In") {
       if (order.status === "Preparing") {
-        msg = `*Theth Masala Order Update*\n\nHi ${order.name},\nOur chefs are preparing your food. It will be served shortly to Table ${order.tableNumber}!`;
+        msg = `*Pista House Order Update*\n\nHi ${order.name},\nOur chefs are preparing your food. It will be served shortly to Table ${order.tableNumber}!`;
       } else if (order.status === "Serving Soon") {
-        msg = `*Theth Masala Order Update*\n\nHi ${order.name},\nYour food is cooked and will arrive at your table shortly!`;
+        msg = `*Pista House Order Update*\n\nHi ${order.name},\nYour food is cooked and will arrive at your table shortly!`;
       } else {
-        msg = `*Theth Masala Order Update*\n\nHi ${order.name},\nYour order at Table ${order.tableNumber} is status: *${order.status}*.\n\nEnjoy your meal!`;
+        msg = `*Pista House Order Update*\n\nHi ${order.name},\nYour order at Table ${order.tableNumber} is status: *${order.status}*.\n\nEnjoy your meal!`;
       }
     } else {
       if (order.status === "Preparing") {
-        msg = `*Theth Masala Order Update*\n\nHi ${order.name},\nYour pickup order is being prepared. Est ready time: ${order.estimatedReadyTime}.`;
+        msg = `*Pista House Order Update*\n\nHi ${order.name},\nYour pickup order is being prepared. Est ready time: ${order.estimatedReadyTime}.`;
       } else if (order.status === "Ready for Pickup") {
-        msg = `*Theth Masala Order Update*\n\nHi ${order.name},\nYour food is ready! Please collect your order from our Gandipet counter.`;
+        msg = `*Pista House Order Update*\n\nHi ${order.name},\nYour food is ready! Please collect your order from our Narsingi counter.`;
       } else {
-        msg = `*Theth Masala Order Update*\n\nHi ${order.name},\nYour pickup order status is: *${order.status}*.\n\nThank you!`;
+        msg = `*Pista House Order Update*\n\nHi ${order.name},\nYour pickup order status is: *${order.status}*.\n\nThank you!`;
       }
     }
   }
 
-  const waUrl = `https://wa.me/${order.phone.replace(/[^0-9]/g, "") || '919000330089'}?text=${encodeURIComponent(msg)}`;
+  const waUrl = `https://wa.me/${order.phone.replace(/[^0-9]/g, "") || '919876543210'}?text=${encodeURIComponent(msg)}`;
   alert("Redirecting to WhatsApp to send status notification update message.");
   window.open(waUrl, "_blank");
 }
@@ -798,13 +798,13 @@ function applyCampaignTemplate(type) {
 
   let text = "";
   if (type === "diwali") {
-    text = `*🪔 Happy Diwali from Theth Masala! 🪔*\n\nHello {name},\nMay this festival of lights bring health and sweetness to your home. Celebrate Diwali dining with our famous paneer butter masala and special meals.\n\nEnjoy an exclusive *15% dine-in discount* this week. Present this code: *FESTIVAL15* during billing!\n\n📍 Visit us at Shankarpalli Road, Gandipet.`;
+    text = `*🪔 Happy Diwali from Pista House! 🪔*\n\nHello {name},\nMay this festival of lights bring health and sweetness to your home. Celebrate Diwali dining with our famous chicken mandi and tandoori grills.\n\nEnjoy an exclusive *15% dine-in discount* this week. Present this code: *FESTIVAL15* during billing!\n\n📍 Visit us at Snehitha Hills, Narsingi.`;
   } else if (type === "sankranti") {
-    text = `*🌾 Happy Sankranti from Theth Masala! 🌾*\n\nHello {name},\nWishing you a warm harvest season! Indulge in our classic multi-cuisine dishes with your family.\n\nEnjoy *Free Dessert* with every family order of ₹1200 or more! Mention code: *SANKRANTIFREE*.\n\n📞 For reservations: +91 90003 30089.`;
+    text = `*🌾 Happy Sankranti from Pista House! 🌾*\n\nHello {name},\nWishing you a warm harvest season! Indulge in our classic Hyderabadi mutton biryani and fresh juices with your family.\n\nEnjoy *Free Dessert* with every family order of ₹1200 or more! Mention code: *SANKRANTIFREE*.\n\n📞 For reservations: +91 98765 43210.`;
   } else if (type === "newyear") {
-    text = `*🎉 Happy New Year from Theth Masala! 🎉*\n\nHello {name},\nWelcome 2026 with a delectable family treat. Take *10% OFF* on all online pickup pre-orders today!\n\nUse code: *NY2026* during online preorder pickup.\n\n👉 Order now at: https://thethmasala.com`;
+    text = `*🎉 Happy New Year from Pista House! 🎉*\n\nHello {name},\nWelcome 2026 with a delectable family treat. Take *10% OFF* on all online pickup pre-orders today!\n\nUse code: *NY2026* during online preorder pickup.\n\n👉 Order now at: https://pistahouse-narsingi.com`;
   } else if (type === "weekend") {
-    text = `*🔥 Weekend Family treat at Theth Masala! 🔥*\n\nHello {name},\nNo cooking on Sunday! Savor our hot Veg Dum Biryani, Garlic Naan, and Stuffed Paneer Tikka with your family.\n\nReserve a table or pre-order pickup to skip the queues!\n\n📞 Table Booking: +91 90003 30089.`;
+    text = `*🔥 Weekend Family treat at Pista House! 🔥*\n\nHello {name},\nNo cooking on Sunday! Savor our delicious Chicken Mandi, Mutton Dum Biryani, and special Zafrani Chai with your family.\n\nReserve a table or pre-order pickup to skip the queues!\n\n📞 Table Booking: +91 98765 43210.`;
   }
 
   box.value = text;
@@ -1037,7 +1037,7 @@ async function exportOrdersToCSV() {
     csv += `"${r.id}","Reservation","N/A","${r.name}","${r.phone}","${r.date} @ ${r.time}","Dine-in","N/A","${r.status}"\n`;
   });
 
-  triggerCSVDownload(csv, "Theth_Masala_Orders_Export.csv");
+  triggerCSVDownload(csv, "PistaHouse_Orders_Export.csv");
   addAuditLog("Exported active orders database to CSV file", currentRole);
 }
 
@@ -1049,7 +1049,7 @@ async function exportLeadsToCSV() {
     csv += `"${l.name}","${l.phone}","${l.joinDate}","${l.visits}","${l.rewardsProgress}/10","${l.birthday}"\n`;
   });
 
-  triggerCSVDownload(csv, "Theth_Masala_Leads_Export.csv");
+  triggerCSVDownload(csv, "PistaHouse_Leads_Export.csv");
   addAuditLog("Exported leads program directory database to CSV file", currentRole);
 }
 

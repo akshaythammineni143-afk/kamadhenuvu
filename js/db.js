@@ -1,150 +1,150 @@
-// Theth Masala - State Layer supporting Dual-Mode: Supabase & LocalStorage (Unified Orders Edition)
+// Database State Layer supporting Dual-Mode: Supabase & LocalStorage (Unified Orders Edition)
 
 const DEFAULT_MENU = [
   {
     id: "m1",
-    name: "Crispy Chilli Lotus Stem",
-    price: 469,
-    category: "Starters",
-    description: "Crispy fried lotus stem sliced and tossed in sweet honey chili glaze with bell peppers.",
-    image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80",
+    name: "Special Chicken Mandi",
+    price: 490,
+    category: "Mandi",
+    description: "Arabian style slow-cooked Mandi rice topped with juicy spice-rubbed grilled chicken, served with salad and special garlic and spicy tomato dips.",
+    image: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&w=600&q=80",
     bestSeller: true,
-    isVeg: true
+    isVeg: false
   },
   {
     id: "m2",
-    name: "Stuffed Paneer Tikka",
-    price: 420,
-    category: "Starters",
-    description: "Succulent cottage cheese slices stuffed with rich mint chutney and clay oven grilled.",
-    image: "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?auto=format&fit=crop&w=600&q=80",
+    name: "Royal Mutton Mandi",
+    price: 640,
+    category: "Mandi",
+    description: "Perfectly seasoned long grain basmati rice served with incredibly tender mutton shank slow-roasted with Arabian herbs and dry fruits.",
+    image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
     bestSeller: true,
-    isVeg: true
+    isVeg: false
   },
   {
     id: "m3",
-    name: "Veg Spicy Manchow Soup",
-    price: 219,
-    category: "Soups",
-    description: "A popular hot and spicy Indo-Chinese soup loaded with minced vegetables, topped with crispy noodles.",
-    image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
-    bestSeller: false,
-    isVeg: true
+    name: "Pista House Special Haleem",
+    price: 290,
+    category: "Starters",
+    description: "Our world-famous seasonal delicacy made of pure mutton, wheat, lentils, ghee, and exotic spices, slow-cooked to a thick pasty consistency and garnished with fried onions, lemons, and cashews.",
+    image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80",
+    bestSeller: true,
+    isVeg: false
   },
   {
     id: "m4",
-    name: "Paneer Butter Masala",
-    price: 479,
-    category: "Main Course",
-    description: "Soft paneer cubes cooked in a rich, creamy, and mildly sweet onion-tomato butter gravy.",
-    image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80",
-    bestSeller: true,
-    isVeg: true
+    name: "Chicken 65",
+    price: 280,
+    category: "Starters",
+    description: "A popular South Indian deep-fried spicy chicken appetizer tossed with fresh curry leaves, yogurt, and red chilies.",
+    image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=600&q=80",
+    bestSeller: false,
+    isVeg: false
   },
   {
     id: "m5",
-    name: "Shahi Paneer",
-    price: 450,
-    category: "Main Course",
-    description: "Royal cottage cheese cubes cooked in a sweet cashew nut paste and onion gravy.",
-    image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=600&q=80",
+    name: "Hyderabadi Chicken Biryani",
+    price: 340,
+    category: "Biryani",
+    description: "Fragrant long-grain basmati rice layered with marinated chicken, saffron, fried onions, and pure ghee, cooked in the traditional clay pot Dum style.",
+    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80",
     bestSeller: true,
-    isVeg: true
+    isVeg: false
   },
   {
     id: "m6",
-    name: "Shahi Kaju Masala",
-    price: 480,
-    category: "Main Course",
-    description: "Roasted cashew nuts cooked in a rich, buttery, and mildly spiced yellow gravy.",
+    name: "Hyderabadi Mutton Biryani",
+    price: 390,
+    category: "Biryani",
+    description: "Exquisite layered rice dish cooked with tender mutton pieces infused with cardamom, cinnamon, and fresh mint.",
     image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80",
-    bestSeller: false,
-    isVeg: true
+    bestSeller: true,
+    isVeg: false
   },
   {
     id: "m7",
-    name: "Dal Makhani",
-    price: 320,
-    category: "Main Course",
-    description: "Black lentils slow-cooked overnight with spices, butter and fresh cream.",
-    image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+    name: "Seekh Kebab",
+    price: 290,
+    category: "Grills",
+    description: "Skewered minced mutton mixed with aromatic spices, fresh coriander, and mint, grilled to smoky perfection in our tandoor.",
+    image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80",
     bestSeller: false,
-    isVeg: true
+    isVeg: false
   },
   {
     id: "m8",
-    name: "Garlic Naan",
-    price: 90,
-    category: "Breads",
-    description: "Soft and fluffy leavened flatbread baked in a tandoor, glazed with butter and fresh minced garlic.",
+    name: "Tandoori Chicken (Half)",
+    price: 310,
+    category: "Grills",
+    description: "Juicy half chicken marinated in classic yogurt, tandoori masala, and red spices, roasted in our traditional clay oven.",
     image: "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=600&q=80",
     bestSeller: false,
-    isVeg: true
+    isVeg: false
   },
   {
     id: "m9",
-    name: "Veg Dum Biryani",
-    price: 429,
-    category: "Rice & Noodles",
-    description: "Fragrant basmati rice slow-cooked with spiced seasonal vegetables and fresh herbs in Hyderabadi style.",
-    image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80",
+    name: "Classic Chicken Shawarma",
+    price: 150,
+    category: "Shawarma",
+    description: "Thinly sliced slow-roasted chicken rolled in flatbread with pickled vegetables, french fries, and creamy garlic mayonnaise.",
+    image: "https://images.unsplash.com/photo-1561651823-34fed022540e?auto=format&fit=crop&w=600&q=80",
     bestSeller: true,
-    isVeg: true
+    isVeg: false
   },
   {
     id: "m10",
-    name: "Moong Dal Halwa",
-    price: 220,
+    name: "Qubani Ka Meetha",
+    price: 160,
     category: "Desserts",
-    description: "Classic rich dessert made with split green gram paste, cooked with pure ghee, sugar, and dried nuts.",
+    description: "Traditional Hyderabadi dessert made from dried stewed apricots, garnished with almonds and fresh thick cream.",
     image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=600&q=80",
     bestSeller: true,
     isVeg: true
   },
   {
     id: "m11",
-    name: "Mango Lassi",
-    price: 140,
+    name: "Special Zafrani Chai",
+    price: 60,
     category: "Beverages",
-    description: "A refreshing, thick yogurt-based drink flavored with sweet ripe mango pulp and saffron.",
-    image: "https://images.unsplash.com/photo-1571006682889-7f8f5f24164b?auto=format&fit=crop&w=600&q=80",
-    bestSeller: false,
+    description: "Pista House iconic thick-brewed cream tea flavored with crushed green cardamom, saffron strands, and condensed milk.",
+    image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80",
+    bestSeller: true,
     isVeg: true
   },
   {
     id: "m12",
-    name: "Masala Chai",
-    price: 60,
+    name: "Fresh Mint Lime Soda",
+    price: 90,
     category: "Beverages",
-    description: "Traditional Indian tea brewed with milk, ginger, cardamom, cloves, and aromatic spices.",
-    image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80",
+    description: "Refreshing fizzy cooler brewed with freshly squeezed lime juice, mint sprigs, black salt, and sugar syrup.",
+    image: "https://images.unsplash.com/photo-1571006682889-7f8f5f24164b?auto=format&fit=crop&w=600&q=80",
     bestSeller: false,
     isVeg: true
   }
 ];
 
 const DEFAULT_SPECIAL = {
-  name: "Veg Dum Biryani",
-  price: 429,
-  description: "Our special signature basmati rice slow-cooked with fresh garden vegetables and house-spices in a sealed clay pot. Savor the authentic Hyderabadi flavor!",
-  image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80",
-  badge: "Chef's Signature",
-  discount: "10% Off on Pre-Orders"
+  name: "Royal Mutton Mandi Platter",
+  price: 640,
+  description: "Our signature slow-cooked mutton mandi served with aromatic long-grain rice, topped with caramelized onions and roasted almonds. Perfect for sharing!",
+  image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+  badge: "Arabian Delight",
+  discount: "Complimentary Zafrani Chai (Weekend Only)"
 };
 
 const DEFAULT_REVIEWS = [
-  { name: "Rahul Sharma", rating: 5, text: "Excellent dining experience! The Veg Dum Biryani is out of this world, and the Chilli Lotus Stem is a must-try. Premium ambiance near Ocean Park.", date: "2 days ago" },
-  { name: "Priya Reddy", rating: 4.5, text: "Loved the Stuffed Paneer Tikka and Veg Dum Biryani. Very hygienic and fast service. Great for family dinners on Shankarpalli Road!", date: "1 week ago" },
-  { name: "Ankit Verma", rating: 5, text: "The Garlic Naan was so soft and fresh. Paneer Butter Masala was perfectly creamy. Best place in Gandipet area. 10/10 would visit again.", date: "2 weeks ago" },
-  { name: "Suresh Kumar", rating: 4, text: "Best multi-cuisine family restaurant near Kokapet/Gandipet. Large seating area. Biryani was amazing, but gets busy on weekends.", date: "3 weeks ago" }
+  { name: "Adnan Khan", rating: 5, text: "The Mutton Mandi was absolutely spectacular! Extremely tender meat that falls off the bone. Also tried their iconic Zafrani Chai, outstanding quality.", date: "2 days ago" },
+  { name: "Priya Sen", rating: 4.5, text: "Best Hyderabadi Chicken Biryani in town! The spices are perfectly balanced and the chicken is juicy. Highly recommend the Qubani Ka Meetha for dessert.", date: "1 week ago" },
+  { name: "Sameer Uddin", rating: 5, text: "Pista House Haleem is the gold standard! Thick, rich, ghee-laden, and packed with flavor. The seating area is excellent for large groups.", date: "2 weeks ago" },
+  { name: "Kiran Kumar", rating: 4, text: "Excellent Shawarma and Grills. The Tandoori Chicken was roasted to perfection. Gets very crowded on weekends, but service is reasonably quick.", date: "3 weeks ago" }
 ];
 
 const DEFAULT_PREP_TIMES = {
+  "Mandi": 35,
+  "Biryani": 25,
   "Starters": 15,
-  "Soups": 10,
-  "Main Course": 25,
-  "Breads": 5,
-  "Rice & Noodles": 20,
+  "Grills": 30,
+  "Shawarma": 10,
   "Desserts": 10,
   "Beverages": 5
 };

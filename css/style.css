@@ -1,22 +1,22 @@
-/* Theth Masala - Premium CSS Design System */
+/* Pista House - Premium Arabian & Hyderabadi Theme Design System */
 
 :root {
   /* Colors */
-  --primary: #1e4620;
-  --primary-light: #2d6a4f;
-  --primary-dark: #122c14;
-  --secondary: #b8860b;
-  --secondary-light: #d4af37;
-  --accent: #ff8c00;
-  --bg-cream: #faf6f0;
-  --bg-white: #ffffff;
-  --text-dark: #2c312e;
-  --text-muted: #5a625e;
-  --border-light: #e6dfd5;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-  --shadow-md: 0 8px 24px rgba(30,70,32,0.08);
-  --shadow-lg: 0 16px 40px rgba(30,70,32,0.15);
-  --glass: rgba(255, 255, 255, 0.85);
+  --primary: #6b0c1b;         /* Deep Maroon */
+  --primary-light: #a21a2c;   /* Crimson Red */
+  --primary-dark: #3d000a;    /* Dark Velvet Maroon */
+  --secondary: #b8860b;       /* Gold */
+  --secondary-light: #d4af37; /* Light Gold */
+  --accent: #f97316;          /* Warm Orange / Amber */
+  --bg-cream: #121212;        /* Dark Velvet Black */
+  --bg-white: #1e1e1e;        /* Dark Charcoal */
+  --text-dark: #faf6f0;       /* Soft Off-White Text */
+  --text-muted: #a3a3a3;      /* Silver Grey */
+  --border-light: #2d2d2d;    /* Dark Border */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.5);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.6);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.8);
+  --glass: rgba(30, 30, 30, 0.85);
 
   /* Fonts */
   --font-heading: 'Outfit', sans-serif;
@@ -181,6 +181,28 @@ button, input, select, textarea {
   width: 8px;
   height: 8px;
   background-color: #2d6a4f;
+  border-radius: 50%;
+}
+
+/* Non-Veg Icon */
+.nonveg-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #dc2626;
+  border-radius: 3px;
+  padding: 2px;
+  background: white;
+}
+
+.nonveg-badge::after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  background-color: #dc2626;
   border-radius: 50%;
 }
 
@@ -379,6 +401,7 @@ header.site-header.scrolled .btn-nav {
   font-size: 15px;
   outline: none;
   background-color: var(--bg-white);
+  color: var(--text-dark);
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
 }
@@ -843,6 +866,8 @@ header.site-header.scrolled .btn-nav {
   padding: 12px 16px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-light);
+  background-color: var(--bg-white);
+  color: var(--text-dark);
   outline: none;
   font-size: 14px;
   transition: var(--transition);
